@@ -25,6 +25,11 @@ Problemas reais encontrados construindo isto, e como cada um foi resolvido
   modelo**, achado novo) só deixou reprocessar 2 dos 7 editais para medir
   se a correção funcionou. Sinal qualitativo positivo nos 2, validação
   quantitativa completa pendente. Detalhes: [`DIARIO-DE-BORDO.md`](DIARIO-DE-BORDO.md).
+- **M4 — o serviço: concluído.** FastAPI com `/health`, `/editais/{id}`,
+  `/fila`, `/metrics`, `/ingestao` (worker assíncrono). `docker compose up`
+  testado de verdade (build + up + healthcheck + curl nos 4 endpoints
+  contra o cache real + down). Orçamento explícito (custo máximo e timeout
+  por edital) aplicado no código, não só documentado.
 
 ## Fonte de dados
 
@@ -74,10 +79,17 @@ src/extract/
   run_extract.py    CLI de extração (M2)
 scripts/
   evaluate.py       harness (M3): `--sem-llm` e com conjunto dourado
+src/api/
+  main.py           FastAPI: /health, /editais/{id}, /fila, /metrics,
+                    /ingestao (M4) — lê só do cache, nunca chama PNCP/Gemini
+                    no ciclo de requisição
+  worker.py         worker assíncrono de ingestão (thread + job_id)
+src/config.py       CACHE_DIR, orçamento explícito (custo máximo, timeout)
 data/
   golden_set.json   conjunto dourado, rotulado à mão
   cache/            metadata/, raw/, text/ (M1), extractions/ (M2) — local, fora do git
-tests/              35 testes unitários, todos sem rede
+Dockerfile, docker-compose.yml   `docker compose up` sobe o serviço (M4)
+tests/              55 testes unitários, todos sem rede
 ```
 
 ## Uso
@@ -97,6 +109,11 @@ python -m src.extract.run_extract --n 30
 python -m scripts.evaluate --sem-llm   # sempre disponível, não chama LLM
 python -m scripts.evaluate             # + conjunto dourado, usa cache existente
 python -m scripts.evaluate --allow-llm-calls   # extrai o que faltar no cache
+
+# M4 — o serviço
+.venv/Scripts/python -m uvicorn src.api.main:app --reload
+# ou, com Docker:
+docker compose up
 ```
 
 Rodar os testes (sem rede, sem chave de API):
@@ -104,6 +121,17 @@ Rodar os testes (sem rede, sem chave de API):
 ```bash
 .venv/Scripts/python -m pytest tests/ -q
 ```
+
+### Endpoints (M4)
+
+| Rota | O que faz |
+|---|---|
+| `GET /health` | checagem simples do cache |
+| `GET /editais/{key}` | metadados + extração completa de um edital (404 se não estiver no cache) |
+| `GET /fila?capacidade=N` | fila de leitura ordenada por **valor esperado** (não por relevância) |
+| `GET /metrics` | custo acumulado, latência p50/p95, taxa de abstenção por campo, cobertura de texto (M1) |
+| `POST /ingestao?n=N&data_final=AAAAMMDD` | dispara ingestão em background, devolve `job_id` na hora (202) |
+| `GET /ingestao/{job_id}` | status do job (`enfileirado` / `rodando` / `concluido` / `falhou`) |
 
 ## Relatório de cobertura (M1)
 
