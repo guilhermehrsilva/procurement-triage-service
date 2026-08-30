@@ -1,0 +1,35 @@
+{
+  "sem_llm": {
+    "cobertura_texto_m1": {
+      "data_final": "20260930",
+      "n_solicitado": 2,
+      "n_processado": 2,
+      "elapsed_seconds": 12.3,
+      "contagem_por_status": {
+        "texto_ok": 2
+      }
+    },
+    "n_extracoes_em_cache": 2,
+    "verificabilidade_citacao": {
+      "prazo_entrega_proposta": {
+        "com_citacao_verificada": 2,
+        "nulo": 0
+      },
+      "valor_estimado": {
+        "com_citacao_verificada": 1,
+        "nulo": 1
+      },
+      "exigencias_habilitacao": {
+        "itens_aceitos": 0,
+        "itens_rejeitados": 1,
+        "taxa_rejeicao": 1.0
+      },
+      "nota": "100% dos campos e itens aqui, por construção, têm citação que passou na verificação (verifier.py) — o que falhou já virou null/foi descartado antes de chegar aqui."
+    },
+    "divergencia_valor": {
+      "editais_com_valor_no_pdf_e_na_api": 1,
+      "editais_divergentes": 0,
+      "diferenca_percentual_media_dos_divergentes": null
+    }
+  }
+}

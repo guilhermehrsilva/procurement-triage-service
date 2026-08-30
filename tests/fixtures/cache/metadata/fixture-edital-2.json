@@ -1,0 +1,7 @@
+{
+  "numeroControlePNCP": "00000000000000-1-000002/2026",
+  "orgaoEntidade": {"razaoSocial": "ÓRGÃO FICTÍCIO DE TESTE 2"},
+  "objetoCompra": "Serviço fictício para fins de teste de CI, com valor sigiloso.",
+  "dataEncerramentoProposta": "2026-09-15T14:00:00",
+  "valorTotalEstimado": 0.0
+}

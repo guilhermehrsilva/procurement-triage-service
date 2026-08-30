@@ -1,0 +1,53 @@
+{
+  "srp": true,
+  "orgaoEntidade": {
+    "cnpj": "00394429000100",
+    "razaoSocial": "COMANDO DA AERONAUTICA",
+    "poderId": "E",
+    "esferaId": "F"
+  },
+  "anoCompra": 2026,
+  "sequencialCompra": 899,
+  "dataInclusao": "2026-05-08T07:04:47",
+  "dataPublicacaoPncp": "2026-05-08T07:04:47",
+  "dataAtualizacao": "2026-08-19T07:00:22",
+  "numeroCompra": "90023",
+  "unidadeOrgao": {
+    "ufNome": "Rio de Janeiro",
+    "codigoUnidade": "120195",
+    "nomeUnidade": "CENTRO DE AQUISIÇÕES ESPECIFICAS",
+    "ufSigla": "RJ",
+    "municipioNome": "Rio de Janeiro",
+    "codigoIbge": "3304557"
+  },
+  "amparoLegal": {
+    "descricao": "pregão: modalidade de licitação obrigatória para aquisição de bens e serviços comuns",
+    "nome": "Lei 14.133/2021, Art. 28, I",
+    "codigo": 1
+  },
+  "dataAberturaProposta": "2026-08-19T08:00:00",
+  "dataEncerramentoProposta": "2026-08-31T09:00:00",
+  "informacaoComplementar": " Para as respostas de esclarecimentos e impugnações deste edital acesse o link: https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-web/public/landing?destino=quadro-informativo&compra=12019505900232026",
+  "processo": "67106001831202588",
+  "objetoCompra": "Aquisição de calçados II",
+  "linkSistemaOrigem": "https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-web/public/landing?destino=acompanhamento-compra&compra=12019505900232026",
+  "justificativaPresencial": null,
+  "unidadeSubRogada": null,
+  "orgaoSubRogado": null,
+  "valorTotalHomologado": null,
+  "modoDisputaId": 3,
+  "emendaParlamentar": null,
+  "dataAtualizacaoGlobal": "2026-08-19T07:00:29",
+  "modalidadeId": 6,
+  "numeroControlePNCP": "00394429000100-1-000899/2026",
+  "linkProcessoEletronico": null,
+  "valorTotalEstimado": 0.0,
+  "modalidadeNome": "Pregão - Eletrônico",
+  "modoDisputaNome": "Aberto-Fechado",
+  "tipoInstrumentoConvocatorioCodigo": 1,
+  "tipoInstrumentoConvocatorioNome": "Edital",
+  "fontesOrcamentarias": [],
+  "situacaoCompraId": 1,
+  "situacaoCompraNome": "Divulgada no PNCP",
+  "usuarioNome": "Compras.gov.br"
+}

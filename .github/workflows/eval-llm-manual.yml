@@ -1,0 +1,54 @@
+name: Avaliação com LLM (manual)
+
+# Disparado manualmente (Actions -> Run workflow), nunca em todo PR.
+#
+# Por quê: a cota gratuita do Gemini é de só 20 requisições/dia POR MODELO
+# (ver DIARIO-DE-BORDO.md, achado #12). Rodar isto em todo PR estouraria a
+# cota quase imediatamente e deixaria o CI vermelho por falta de cota, não
+# por regressão de qualidade de verdade — o oposto do que um portão de CI
+# deve fazer. A avaliação com LLM (acurácia por campo contra o conjunto
+# dourado) roda quando alguém decide gastar a cota, não automaticamente.
+#
+# Requer o secret GEMINI_API_KEY configurado no repositório.
+
+on:
+  workflow_dispatch:
+    inputs:
+      forcar_reextracao:
+        description: "Reextrai todos os editais do golden set, mesmo os já em cache (--force)"
+        type: boolean
+        default: false
+
+jobs:
+  avaliar:
+    name: Extrai e avalia o conjunto dourado com o Gemini de verdade
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+      - name: Semear o cache com metadata/texto já ingeridos (M1) do conjunto dourado
+        # CI não guarda o cache de produção (é local, fora do git). Os 7
+        # editais do golden set têm metadata+texto (M1) já commitados como
+        # fixture — só o que falta (extração via LLM, M2) roda aqui.
+        run: |
+          mkdir -p ci_cache/metadata ci_cache/text
+          cp tests/fixtures/golden_set_cache/metadata/*.json ci_cache/metadata/
+          cp tests/fixtures/golden_set_cache/text/*.json ci_cache/text/
+      - name: Rodar avaliação
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [ "${{ inputs.forcar_reextracao }}" = "true" ]; then
+            python -m scripts.evaluate --force --cache-dir ci_cache
+          else
+            python -m scripts.evaluate --allow-llm-calls --cache-dir ci_cache
+          fi
+      - name: Publicar relatório como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: ci_cache/eval_report.json

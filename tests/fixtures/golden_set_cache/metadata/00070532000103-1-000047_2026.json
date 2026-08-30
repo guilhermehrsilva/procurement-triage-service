@@ -1,0 +1,53 @@
+{
+  "srp": false,
+  "orgaoEntidade": {
+    "cnpj": "00070532000103",
+    "razaoSocial": "DEPARTAMENTO DE ESTRADAS DE RODAGEM DO DISTRITO FEDERAL",
+    "poderId": "E",
+    "esferaId": "D"
+  },
+  "anoCompra": 2026,
+  "sequencialCompra": 47,
+  "dataInclusao": "2026-03-26T07:13:58",
+  "dataPublicacaoPncp": "2026-03-26T07:13:58",
+  "dataAtualizacao": "2026-08-20T07:03:45",
+  "numeroCompra": "90008",
+  "unidadeOrgao": {
+    "ufNome": "Distrito Federal",
+    "codigoUnidade": "926120",
+    "nomeUnidade": "EDF - DEPARTAMENTO DE ESTRADAS DE RODAGEM",
+    "ufSigla": "DF",
+    "municipioNome": "Brasília",
+    "codigoIbge": "5300108"
+  },
+  "amparoLegal": {
+    "descricao": "pregão: modalidade de licitação obrigatória para aquisição de bens e serviços comuns",
+    "nome": "Lei 14.133/2021, Art. 28, I",
+    "codigo": 1
+  },
+  "dataAberturaProposta": "2026-08-19T08:00:00",
+  "dataEncerramentoProposta": "2026-09-08T10:00:00",
+  "informacaoComplementar": "Em caso de divergência na especificação do objeto entre o Portal de Compras do Governo Federal e o Edital, prevalece a do Edital. Para as respostas de esclarecimentos e impugnações deste edital acesse o link: https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-web/public/landing?destino=quadro-informativo&compra=92612005900082026",
+  "processo": "11300009050202631",
+  "objetoCompra": "O objeto da presente licitação é a contratação de empresa especializada para fornecimento e alocação de mão de obra com regime de dedicação exclusiva, conforme condições, quantidades e exigências estabelecidas no Edital e seus anexos.",
+  "linkSistemaOrigem": "https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-web/public/landing?destino=acompanhamento-compra&compra=92612005900082026",
+  "justificativaPresencial": null,
+  "unidadeSubRogada": null,
+  "orgaoSubRogado": null,
+  "valorTotalHomologado": null,
+  "modoDisputaId": 1,
+  "emendaParlamentar": null,
+  "dataAtualizacaoGlobal": "2026-08-20T07:03:45",
+  "modalidadeId": 6,
+  "numeroControlePNCP": "00070532000103-1-000047/2026",
+  "linkProcessoEletronico": null,
+  "valorTotalEstimado": 181487347.81,
+  "modalidadeNome": "Pregão - Eletrônico",
+  "modoDisputaNome": "Aberto",
+  "tipoInstrumentoConvocatorioCodigo": 1,
+  "tipoInstrumentoConvocatorioNome": "Edital",
+  "fontesOrcamentarias": [],
+  "situacaoCompraId": 4,
+  "situacaoCompraNome": "Suspensa",
+  "usuarioNome": "Compras.gov.br"
+}

@@ -1,0 +1,9 @@
+{
+  "key": "fixture-edital-2",
+  "numeroControlePNCP": "00000000000000-1-000002/2026",
+  "status": "texto_ok",
+  "num_paginas": 1,
+  "pages": [
+    {"page": 1, "text": "O orçamento estimado desta contratação é sigiloso. As propostas deverão ser enviadas até o dia 15 de setembro de 2026 às 14h."}
+  ]
+}

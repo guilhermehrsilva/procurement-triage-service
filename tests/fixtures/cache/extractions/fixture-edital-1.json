@@ -1,0 +1,39 @@
+{
+  "key": "fixture-edital-1",
+  "numero_controle_pncp": "00000000000000-1-000001/2026",
+  "prazo_entrega_proposta": {
+    "valor": "2026-09-08T10:00:00",
+    "citacao": {"pagina": 1, "trecho": "As propostas deverão ser enviadas até o dia 08 de setembro de 2026 às 10h."},
+    "motivo_nulo": null
+  },
+  "valor_estimado": {
+    "valor": 100000.0,
+    "citacao": {"pagina": 1, "trecho": "Valor total estimado: R$ 100.000,00."},
+    "motivo_nulo": null
+  },
+  "exigencias_habilitacao": {
+    "itens": [
+      {
+        "descricao": "atestado de capacidade técnica fictício, para fins de teste",
+        "citacao": {"pagina": 1, "trecho": "Valor total estimado: R$ 100.000,00."}
+      }
+    ],
+    "itens_rejeitados": 1
+  },
+  "divergencia_valor": {
+    "valor_api": 100000.0,
+    "valor_pdf": 100000.0,
+    "diferenca_absoluta": 0.0,
+    "diferenca_percentual": 0.0
+  },
+  "uso_llm": {
+    "modelo": "fixture",
+    "n_chamadas": 3,
+    "tokens_entrada": 300,
+    "tokens_saida": 100,
+    "custo_estimado_usd": 0.001,
+    "latencia_total_segundos": 8.0
+  },
+  "motivo_interrupcao": null,
+  "campos_nao_tentados": []
+}

@@ -1,0 +1,53 @@
+{
+  "amparoLegal": {
+    "codigo": 1,
+    "descricao": "pregão: modalidade de licitação obrigatória para aquisição de bens e serviços comuns",
+    "nome": "Lei 14.133/2021, Art. 28, I"
+  },
+  "unidadeOrgao": {
+    "ufNome": "Piauí",
+    "ufSigla": "PI",
+    "municipioNome": "Parnaguá",
+    "codigoUnidade": "3112",
+    "nomeUnidade": "MUNICIPIO DE PARNAGUÁ/ PI",
+    "codigoIbge": "2207603"
+  },
+  "srp": true,
+  "orgaoEntidade": {
+    "cnpj": "06554265000118",
+    "razaoSocial": "MUNICIPIO DE PARNAGUA",
+    "poderId": "N",
+    "esferaId": "M"
+  },
+  "anoCompra": 2026,
+  "sequencialCompra": 31,
+  "dataInclusao": "2026-07-02T23:40:26",
+  "dataPublicacaoPncp": "2026-07-02T23:40:26",
+  "dataAtualizacao": "2026-08-24T21:04:53",
+  "numeroCompra": "021",
+  "dataAberturaProposta": "2026-08-24T21:04:37",
+  "dataEncerramentoProposta": "2026-09-11T09:00:00",
+  "informacaoComplementar": "",
+  "processo": "041/2026",
+  "objetoCompra": "[LICITANET] - Registro de Preços para futura e eventual aquisição parcelada de artefatos de concreto pré-moldados, para atender as demandas de infraestrutura do Município de Parnaguá-PI, conforme especificações, quantidades estimadas e condições estabelecidas no Termo de Referência e demais anexos Do Edital. A licitação será dividida em ITENS, conforme tabela constante do Termo de Referência, facultando-se ao licitante a participação em quantos itens forem de seu interesse.",
+  "linkSistemaOrigem": "https://licitanet.com.br/sessao/192221",
+  "justificativaPresencial": "",
+  "unidadeSubRogada": null,
+  "orgaoSubRogado": null,
+  "valorTotalHomologado": null,
+  "emendaParlamentar": null,
+  "linkProcessoEletronico": null,
+  "modoDisputaId": 1,
+  "numeroControlePNCP": "06554265000118-1-000031/2026",
+  "modalidadeId": 6,
+  "dataAtualizacaoGlobal": "2026-08-24T21:05:57",
+  "modalidadeNome": "Pregão - Eletrônico",
+  "modoDisputaNome": "Aberto",
+  "fontesOrcamentarias": [],
+  "situacaoCompraId": 1,
+  "situacaoCompraNome": "Divulgada no PNCP",
+  "tipoInstrumentoConvocatorioCodigo": 1,
+  "tipoInstrumentoConvocatorioNome": "Edital",
+  "usuarioNome": "Licitanet Licitações Eletrônicas LTDA",
+  "valorTotalEstimado": 769206.44
+}

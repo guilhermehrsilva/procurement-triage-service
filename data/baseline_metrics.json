@@ -1,0 +1,6 @@
+{
+  "_leia_isto": "Teto/piso usados pelo portão de qualidade em CI (scripts/ci_gate.py). Mudar um valor aqui para 'passar no CI' sem justificar a mudança na descrição do PR é exatamente o tipo de coisa que este arquivo existe para impedir.",
+  "custo_medio_maximo_por_edital_usd": 0.01,
+  "taxa_rejeicao_habilitacao_maxima": 0.5,
+  "cobertura_texto_minima": 0.5
+}

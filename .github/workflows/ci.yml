@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  testes:
+    name: Testes unitários (sem rede, sem LLM)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+      - name: Rodar testes
+        run: python -m pytest tests/ -v
+
+  portao-qualidade:
+    name: Portão de qualidade (M5) — custo, rejeição, cobertura
+    runs-on: ubuntu-latest
+    needs: testes
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+      - name: Rodar o portão contra o fixture de CI
+        run: python -m scripts.ci_gate --cache-dir tests/fixtures/cache --baseline data/baseline_metrics.json

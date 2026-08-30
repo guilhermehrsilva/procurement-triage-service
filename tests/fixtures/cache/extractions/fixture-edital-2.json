@@ -1,0 +1,34 @@
+{
+  "key": "fixture-edital-2",
+  "numero_controle_pncp": "00000000000000-1-000002/2026",
+  "prazo_entrega_proposta": {
+    "valor": "2026-09-15T14:00:00",
+    "citacao": {"pagina": 1, "trecho": "As propostas deverão ser enviadas até o dia 15 de setembro de 2026 às 14h."},
+    "motivo_nulo": null
+  },
+  "valor_estimado": {
+    "valor": null,
+    "citacao": null,
+    "motivo_nulo": "orçamento sigiloso"
+  },
+  "exigencias_habilitacao": {
+    "itens": [],
+    "itens_rejeitados": 0
+  },
+  "divergencia_valor": {
+    "valor_api": 0.0,
+    "valor_pdf": null,
+    "diferenca_absoluta": null,
+    "diferenca_percentual": null
+  },
+  "uso_llm": {
+    "modelo": "fixture",
+    "n_chamadas": 3,
+    "tokens_entrada": 280,
+    "tokens_saida": 90,
+    "custo_estimado_usd": 0.0009,
+    "latencia_total_segundos": 6.5
+  },
+  "motivo_interrupcao": null,
+  "campos_nao_tentados": []
+}

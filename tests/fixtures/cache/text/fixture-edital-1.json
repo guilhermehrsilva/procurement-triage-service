@@ -1,0 +1,9 @@
+{
+  "key": "fixture-edital-1",
+  "numeroControlePNCP": "00000000000000-1-000001/2026",
+  "status": "texto_ok",
+  "num_paginas": 1,
+  "pages": [
+    {"page": 1, "text": "As propostas deverão ser enviadas até o dia 08 de setembro de 2026 às 10h. Valor total estimado: R$ 100.000,00."}
+  ]
+}

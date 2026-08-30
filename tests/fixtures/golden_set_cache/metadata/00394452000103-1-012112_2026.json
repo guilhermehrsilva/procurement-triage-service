@@ -1,0 +1,53 @@
+{
+  "unidadeOrgao": {
+    "ufNome": "Espírito Santo",
+    "ufSigla": "ES",
+    "municipioNome": "Vila Velha",
+    "codigoUnidade": "160093",
+    "nomeUnidade": "38  BATALHAO DE INFANTARIA/MEX/ES",
+    "codigoIbge": "3205200"
+  },
+  "amparoLegal": {
+    "descricao": "pregão: modalidade de licitação obrigatória para aquisição de bens e serviços comuns",
+    "nome": "Lei 14.133/2021, Art. 28, I",
+    "codigo": 1
+  },
+  "dataAberturaProposta": "2026-06-25T09:30:00",
+  "dataEncerramentoProposta": "2026-09-04T10:00:00",
+  "informacaoComplementar": " Para as respostas de esclarecimentos e impugnações deste edital acesse o link: https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-web/public/landing?destino=quadro-informativo&compra=16009305900032026",
+  "processo": "64064.014077/2025",
+  "objetoCompra": "Aquisição de gases medicinais (oxigênio e ar comprimido) com fornecimento de cilindros em regime de comodato  para estruturar e adequar as instalações da nova unidade de Pronto Atendimento (PA) do Posto Médico da Guarnição  de Vila Velha/ES (PMGuVV).",
+  "linkSistemaOrigem": "https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-web/public/landing?destino=acompanhamento-compra&compra=16009305900032026",
+  "justificativaPresencial": null,
+  "unidadeSubRogada": null,
+  "orgaoSubRogado": null,
+  "valorTotalHomologado": null,
+  "srp": true,
+  "orgaoEntidade": {
+    "cnpj": "00394452000103",
+    "razaoSocial": "COMANDO DO EXERCITO",
+    "poderId": "E",
+    "esferaId": "F"
+  },
+  "anoCompra": 2026,
+  "sequencialCompra": 12112,
+  "dataInclusao": "2026-06-25T07:04:14",
+  "dataPublicacaoPncp": "2026-06-25T07:04:14",
+  "dataAtualizacao": "2026-08-25T08:04:33",
+  "numeroCompra": "90003",
+  "numeroControlePNCP": "00394452000103-1-012112/2026",
+  "dataAtualizacaoGlobal": "2026-08-25T08:04:37",
+  "linkProcessoEletronico": null,
+  "modalidadeId": 6,
+  "modoDisputaId": 1,
+  "emendaParlamentar": null,
+  "valorTotalEstimado": 85972.08,
+  "modalidadeNome": "Pregão - Eletrônico",
+  "modoDisputaNome": "Aberto",
+  "tipoInstrumentoConvocatorioCodigo": 1,
+  "tipoInstrumentoConvocatorioNome": "Edital",
+  "fontesOrcamentarias": [],
+  "situacaoCompraId": 1,
+  "situacaoCompraNome": "Divulgada no PNCP",
+  "usuarioNome": "Compras.gov.br"
+}

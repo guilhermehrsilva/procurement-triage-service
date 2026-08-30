@@ -1,0 +1,53 @@
+{
+  "unidadeOrgao": {
+    "ufNome": "Bahia",
+    "ufSigla": "BA",
+    "municipioNome": "Salvador",
+    "codigoUnidade": "000000001",
+    "nomeUnidade": "EMPRESA BAIANA DE AGUAS E SANEAMENTO S/A - EMBASA",
+    "codigoIbge": "2927408"
+  },
+  "amparoLegal": {
+    "descricao": "Pregão: modalidade de licitação preferencial para a aquisição de bens e serviços comuns, assim considerados aqueles cujos padrões de desempenho e qualidade possam ser objetivamente definidos pelo edital, por meio de especificações usuais no mercado;",
+    "nome": "Lei 13.303/2016, Art. 32, IV",
+    "codigo": 113
+  },
+  "dataAberturaProposta": "2026-09-28T08:00:00",
+  "dataEncerramentoProposta": "2026-09-30T09:00:00",
+  "informacaoComplementar": "",
+  "processo": "SEI 2026.0021517-55",
+  "objetoCompra": "EXECUÇÃO DAS OBRAS DE IMPLANTAÇÃO DO SISTEMA DE ESGOTAMENTO SANITÁRIO DE BRUMADO E VILA PRESIDENTE VARGAS.\nFonte de recursos: Próprios.",
+  "linkSistemaOrigem": "https://licitacoes-e2.bb.com.br/aop-inter-estatico/visualizar-processo-publico/1094815",
+  "justificativaPresencial": "",
+  "unidadeSubRogada": null,
+  "orgaoSubRogado": null,
+  "valorTotalHomologado": null,
+  "srp": false,
+  "orgaoEntidade": {
+    "cnpj": "13504675000110",
+    "razaoSocial": "EMPRESA BAIANA DE AGUAS E SANEAMENTO S/A - EMBASA",
+    "poderId": "N",
+    "esferaId": "N"
+  },
+  "anoCompra": 2026,
+  "sequencialCompra": 159,
+  "dataInclusao": "2026-06-15T10:13:20",
+  "dataPublicacaoPncp": "2026-06-15T10:13:20",
+  "dataAtualizacao": "2026-08-24T23:08:33",
+  "numeroCompra": "LC073/2026",
+  "numeroControlePNCP": "13504675000110-1-000159/2026",
+  "dataAtualizacaoGlobal": "2026-08-24T23:08:34",
+  "linkProcessoEletronico": null,
+  "modalidadeId": 6,
+  "modoDisputaId": 2,
+  "emendaParlamentar": null,
+  "valorTotalEstimado": 0.0,
+  "modalidadeNome": "Pregão - Eletrônico",
+  "modoDisputaNome": "Fechado",
+  "tipoInstrumentoConvocatorioCodigo": 1,
+  "tipoInstrumentoConvocatorioNome": "Edital",
+  "fontesOrcamentarias": [],
+  "situacaoCompraId": 4,
+  "situacaoCompraNome": "Suspensa",
+  "usuarioNome": "Licitações-E BB"
+}

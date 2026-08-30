@@ -1,0 +1,9 @@
+{
+  "data_final": "20260930",
+  "n_solicitado": 2,
+  "n_processado": 2,
+  "elapsed_seconds": 12.3,
+  "contagem_por_status": {
+    "texto_ok": 2
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "amparoLegal": {
+    "codigo": 1,
+    "descricao": "pregão: modalidade de licitação obrigatória para aquisição de bens e serviços comuns",
+    "nome": "Lei 14.133/2021, Art. 28, I"
+  },
+  "unidadeOrgao": {
+    "ufNome": "Ceará",
+    "ufSigla": "CE",
+    "municipioNome": "Quixadá",
+    "codigoUnidade": "202598",
+    "nomeUnidade": "CONSÓRCIO PÚB. DE SAÚDE DA MICRORREGIÃO DE QUIXADÁ",
+    "codigoIbge": "2311306"
+  },
+  "srp": true,
+  "orgaoEntidade": {
+    "cnpj": "14530768000181",
+    "razaoSocial": "CONSORCIO PUBLICO DE SAUDE DA MICRORREGIAO DE QUIXADA - CPSMQ",
+    "poderId": "E",
+    "esferaId": "N"
+  },
+  "anoCompra": 2026,
+  "sequencialCompra": 16,
+  "dataInclusao": "2026-07-08T10:56:57",
+  "dataPublicacaoPncp": "2026-07-08T10:56:57",
+  "dataAtualizacao": "2026-08-14T10:36:30",
+  "numeroCompra": "SRP2026/006-PE",
+  "dataAberturaProposta": "2026-08-17T00:00:00",
+  "dataEncerramentoProposta": "2026-08-31T09:29:00",
+  "informacaoComplementar": "",
+  "processo": "01.22042026",
+  "objetoCompra": "REGISTRO DE PREÇOS PARA FUTURA E EVENTUAL AQUISIÇÃO DE MATERIAL DE LIMPEZA E COPA E COZINHA DESTINADOS A ATENDER AS NECESSIDADES DA POLICLINICA DE QUIXADA E DO CENTRO DE ESPECIALIDADES ODONTOLOGICAS - CEO, DE RESPONSABILIDADE DO CONSORCIO PUBLICO DE SAUDE DA MICRORREGIÃO DE QUIXADA - CPSMQ.",
+  "linkSistemaOrigem": "http://precodereferencia.m2atecnologia.com.br/c/zdNt-oTfSHKoLSK4WZuTzw.G4-JhncKTGQD/",
+  "justificativaPresencial": null,
+  "unidadeSubRogada": null,
+  "orgaoSubRogado": null,
+  "valorTotalHomologado": null,
+  "emendaParlamentar": null,
+  "linkProcessoEletronico": null,
+  "modoDisputaId": 3,
+  "numeroControlePNCP": "14530768000181-1-000016/2026",
+  "modalidadeId": 6,
+  "dataAtualizacaoGlobal": "2026-08-14T11:16:10",
+  "modalidadeNome": "Pregão - Eletrônico",
+  "modoDisputaNome": "Aberto-Fechado",
+  "fontesOrcamentarias": [],
+  "situacaoCompraId": 1,
+  "situacaoCompraNome": "Divulgada no PNCP",
+  "tipoInstrumentoConvocatorioCodigo": 1,
+  "tipoInstrumentoConvocatorioNome": "Edital",
+  "usuarioNome": "M2A tecnologia",
+  "valorTotalEstimado": 1254273.2
+}

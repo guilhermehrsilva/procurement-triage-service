@@ -1,0 +1,53 @@
+{
+  "amparoLegal": {
+    "descricao": "pregão: modalidade de licitação obrigatória para aquisição de bens e serviços comuns",
+    "nome": "Lei 14.133/2021, Art. 28, I",
+    "codigo": 1
+  },
+  "dataAberturaProposta": "2026-09-01T09:00:00",
+  "dataEncerramentoProposta": "2026-09-01T23:59:59",
+  "informacaoComplementar": "ELETRODOMÉSTICOS E ELETRÔNICOS",
+  "processo": "19.000.000096.2025",
+  "objetoCompra": " REGISTRO DE PREÇOS PARA AQUISIÇÃO DE ELETRODOMÉSTICOS E ELETROELETRÔNICOS",
+  "unidadeOrgao": {
+    "ufNome": "Paraíba",
+    "ufSigla": "PB",
+    "municipioNome": "João Pessoa",
+    "codigoUnidade": "19101",
+    "nomeUnidade": "SECRETARIA DE ESTADO DA ADMINISTRACAO",
+    "codigoIbge": "2507507"
+  },
+  "linkSistemaOrigem": "https://www.centraldecompras.pb.gov.br/appls/sgc/edital.nsf/Web?OpenAgent&pageClassName=EditalPage&action=abrir&unid=34A2886842032F9A03258E570040EB9E",
+  "justificativaPresencial": "",
+  "unidadeSubRogada": null,
+  "orgaoSubRogado": null,
+  "valorTotalHomologado": null,
+  "srp": true,
+  "orgaoEntidade": {
+    "cnpj": "08761140000194",
+    "razaoSocial": "SECRETARIA DE ESTADO DA ADMINISTRACAO",
+    "poderId": "E",
+    "esferaId": "E"
+  },
+  "anoCompra": 2026,
+  "sequencialCompra": 12,
+  "dataInclusao": "2026-02-24T09:00:45",
+  "dataPublicacaoPncp": "2026-02-24T09:00:45",
+  "dataAtualizacao": "2026-08-19T09:13:24",
+  "numeroCompra": "19000-010",
+  "emendaParlamentar": null,
+  "dataAtualizacaoGlobal": "2026-08-19T09:15:46",
+  "modalidadeId": 6,
+  "numeroControlePNCP": "08761140000194-1-000012/2026",
+  "linkProcessoEletronico": null,
+  "modoDisputaId": 3,
+  "valorTotalEstimado": 3896433.95,
+  "modalidadeNome": "Pregão - Eletrônico",
+  "modoDisputaNome": "Aberto-Fechado",
+  "tipoInstrumentoConvocatorioCodigo": 1,
+  "tipoInstrumentoConvocatorioNome": "Edital",
+  "fontesOrcamentarias": [],
+  "situacaoCompraId": 1,
+  "situacaoCompraNome": "Divulgada no PNCP",
+  "usuarioNome": "Central de Compras da Paraíba/PB"
+}
