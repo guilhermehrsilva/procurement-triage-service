@@ -71,14 +71,28 @@ def parse_dates(text: str) -> list[dt.datetime]:
     return resultados
 
 
-def _com_hora_proxima(data: dt.date, text: str, inicio: int, fim: int, janela: int = 20) -> dt.datetime:
-    """Se houver um horário a poucos caracteres da data, anexa. Senão, meia-noite."""
-    trecho_seguinte = text[fim : fim + janela]
-    m = _RE_HORA.search(trecho_seguinte)
-    if m:
-        h, mi = int(m.group(1)), int(m.group(2))
-        if h < 24 and mi < 60:
-            return dt.datetime.combine(data, dt.time(h, mi))
+def _com_hora_proxima(data: dt.date, text: str, inicio: int, fim: int, janela: int = 25) -> dt.datetime:
+    """Se houver um horário perto da data (antes OU depois), anexa. Senão, meia-noite.
+
+    "às 10h do dia 08/09/2026" tem a hora ANTES da data; "08/09/2026 às 10h"
+    tem DEPOIS. Um edital real (DER-DF) só usa a primeira forma — olhar só
+    para frente perdia o horário sempre que essa fosse a ordem.
+    """
+    janela_depois = text[fim : fim + janela]
+    janela_antes = text[max(0, inicio - janela) : inicio]
+
+    for m in (_RE_HORA.search(janela_depois), _RE_HORA.search(janela_antes)):
+        if m:
+            h, mi = int(m.group(1)), int(m.group(2))
+            if h < 24 and mi < 60:
+                return dt.datetime.combine(data, dt.time(h, mi))
+
+    for m in (_RE_HORA_SO.search(janela_depois), _RE_HORA_SO.search(janela_antes)):
+        if m:
+            h = int(m.group(1))
+            if h < 24:
+                return dt.datetime.combine(data, dt.time(h, 0))
+
     return dt.datetime.combine(data, dt.time.min)
 
 
