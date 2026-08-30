@@ -24,7 +24,12 @@ logger = logging.getLogger(__name__)
 
 T = TypeVar("T", bound=BaseModel)
 
-DEFAULT_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+# Achado do M3: gemini-2.5-flash no tier gratuito tem cota de só 20
+# requisições/DIA (não é limite por minuto — é
+# "GenerateRequestsPerDayPerProjectPerModel-FreeTier", quotaValue=20). Um
+# único edital (3 chamadas) já consome 15% da cota diária. gemini-2.5-flash-lite
+# tem cota diária bem maior no tier gratuito.
+DEFAULT_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash-lite")
 
 # Preços aproximados do gemini-2.5-flash em 29/08/2026 (USD por 1M de tokens).
 # Configurável porque preço de LLM muda; isto é estimativa, não fatura.
@@ -89,6 +94,7 @@ class GeminiFieldExtractor:
             + self._tokens_saida / 1_000_000 * _PRECO_OUTPUT_POR_1M
         )
         return {
+            "modelo": self._model,
             "n_chamadas": self._n_chamadas,
             "tokens_entrada": self._tokens_entrada,
             "tokens_saida": self._tokens_saida,

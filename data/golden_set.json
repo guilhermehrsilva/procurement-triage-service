@@ -24,6 +24,66 @@
       "tem_exigencias_habilitacao_tecnica": true,
       "habilitacao_fonte": "leitura manual: edital de calçados (fardamento), exige entrega de amostras para avaliação de conformidade — não é 'atestado de capacidade técnica' clássico, mas é uma exigência de habilitação técnica relevante para a decisão comercial",
       "notas": "Objeto simples (aquisição de calçados) comparado ao edital 1. Bom contraste de porte."
+    },
+    {
+      "key": "00394452000103-1-012112_2026",
+      "numero_controle_pncp": "00394452000103-1-012112/2026",
+      "orgao": "COMANDO DO EXÉRCITO",
+      "prazo_entrega_proposta": "2026-09-04T10:00:00",
+      "prazo_fonte": "dataEncerramentoProposta da API",
+      "valor_estimado": null,
+      "valor_fonte": "único valor em R$ encontrado no texto ('VALOR TOTAL DA CONTRATAÇÃO R$ 71.418,24') aparece num trecho que cita 'Vila Velha/ES (PMGuVV)' — outro órgão, provavelmente boilerplate de outro edital usado como modelo. Não é confiável como o valor deste edital. API diz 85.972,08, também não confirmável no texto. Marcado null por não ter certeza, mesma regra que vale para o sistema.",
+      "tem_exigencias_habilitacao_tecnica": false,
+      "habilitacao_fonte": "leitura manual: nenhuma menção a 'capacidade técnica', 'atestado' ou 'qualificação' no documento",
+      "notas": "Caso difícil de propósito: valor monetário presente no texto mas contextualmente suspeito. Bom teste de precisão, não só recall."
+    },
+    {
+      "key": "06554265000118-1-000031_2026",
+      "numero_controle_pncp": "06554265000118-1-000031/2026",
+      "orgao": "MUNICÍPIO DE PARNAGUÁ",
+      "prazo_entrega_proposta": "2026-09-11T09:00:00",
+      "prazo_fonte": "dataEncerramentoProposta da API",
+      "valor_estimado": null,
+      "valor_fonte": "não encontrado como sentença explícita no PDF principal (só limiares de ME/EPP, ex. 'itens até R$ 80.000,00'); valor total provavelmente só na planilha/Relação de Itens anexa, que a pipeline atual não lê. API diz 769.206,44, não confirmável no texto principal.",
+      "tem_exigencias_habilitacao_tecnica": true,
+      "habilitacao_fonte": "leitura manual: exige '01 (um) ou mais Atestados de Capacidade Técnica' explicitamente",
+      "notas": "Evidência de uma limitação real da pipeline: valor estimado às vezes só existe no anexo de itens, não no edital principal."
+    },
+    {
+      "key": "08761140000194-1-000012_2026",
+      "numero_controle_pncp": "08761140000194-1-000012/2026",
+      "orgao": "SECRETARIA DE ESTADO DA ADMINISTRAÇÃO (PB) — SEFAZ/SEAP/CCG/PCPB",
+      "prazo_entrega_proposta": "2026-09-01T23:59:59",
+      "prazo_fonte": "dataEncerramentoProposta da API",
+      "valor_estimado": 4467875.70,
+      "valor_fonte": "leitura manual, texto: 'Valor Total Estimado: R$ 4.467.875,709 (quatro milhões quatrocentos e sessenta e sete mil oitocentos e setenta e cinco reais setenta centavos e nove milésimos de real)' — formato incomum (3 casas decimais no original); arredondado para 2 casas (,70) como qualquer parser de moeda BRL padrão faria.",
+      "tem_exigencias_habilitacao_tecnica": true,
+      "habilitacao_fonte": "leitura manual: 'atestados de capacidade técnica' citados como documento de habilitação exigido",
+      "notas": "DIVERGÊNCIA REAL: API diz valorTotalEstimado=3.896.433,95, o PDF diz R$ 4.467.875,70 — 14,7% de diferença. Achado exatamente do tipo que a proposta (seção 3) pede para medir, não esconder."
+    },
+    {
+      "key": "13504675000110-1-000159_2026",
+      "numero_controle_pncp": "13504675000110-1-000159/2026",
+      "orgao": "EMPRESA BAIANA DE ÁGUAS E SANEAMENTO S/A — EMBASA",
+      "prazo_entrega_proposta": "2026-09-30T09:00:00",
+      "prazo_fonte": "dataEncerramentoProposta da API",
+      "valor_estimado": null,
+      "valor_fonte": "PDF diz explicitamente 'Valor do Objeto: ORÇAMENTO SIGILOSO' — bate com a API (valorTotalEstimado=0.0). Abstenção correta esperada do sistema.",
+      "tem_exigencias_habilitacao_tecnica": true,
+      "habilitacao_fonte": "leitura manual: obra grande (esgotamento sanitário), exige atestados de capacidade técnica, inclusive regras sobre aproveitamento de atestados em fusão/incorporação/cisão",
+      "notas": "Obra de infraestrutura, não aquisição — objeto mais complexo. Orçamento sigiloso confirmado nos dois lados (API e PDF), diferente do caso anterior de valor ausente sem explicação."
+    },
+    {
+      "key": "14530768000181-1-000016_2026",
+      "numero_controle_pncp": "14530768000181-1-000016/2026",
+      "orgao": "CONSÓRCIO PÚBLICO DE SAÚDE DA MICRORREGIÃO DE QUIXADÁ — CPSMQ",
+      "prazo_entrega_proposta": "2026-08-31T09:29:00",
+      "prazo_fonte": "dataEncerramentoProposta da API",
+      "valor_estimado": null,
+      "valor_fonte": "não encontrado como sentença explícita no PDF principal; valor provavelmente só no anexo de itens (mesma limitação do edital de Parnaguá). API diz 1.254.273,20, não confirmável no texto principal.",
+      "tem_exigencias_habilitacao_tecnica": false,
+      "habilitacao_fonte": "leitura manual: nenhuma menção a 'atestado', 'capacidade técnica' ou 'qualificação' no documento",
+      "notas": "Registro de preços de material de limpeza — objeto simples, sem exigência técnica especial. Bom caso de 'abstenção correta' esperada em habilitação."
     }
   ]
 }

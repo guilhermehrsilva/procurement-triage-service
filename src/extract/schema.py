@@ -97,6 +97,7 @@ class UsoLLM(BaseModel):
     """Custo e latência agregados das chamadas de LLM para este edital
     (seção 5 da proposta: custo por edital, latência p50/p95)."""
 
+    modelo: Optional[str] = None
     n_chamadas: int = 0
     tokens_entrada: int = 0
     tokens_saida: int = 0
