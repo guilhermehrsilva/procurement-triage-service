@@ -9,6 +9,7 @@ listagem nunca deve ser chamada dentro de um ciclo de requisição de usuário.
 from __future__ import annotations
 
 import logging
+import time
 from typing import Any, Iterator
 
 import httpx
@@ -34,6 +35,17 @@ TAMANHO_PAGINA_MINIMO = 10
 _RETRYABLE = (httpx.TransportError, httpx.HTTPStatusError, httpx.TimeoutException)
 
 
+class DownloadDeadlineExceeded(Exception):
+    """Levantada quando um download passa do prazo total, mesmo sem nenhum
+    timeout de rede individual disparar.
+
+    httpx.Timeout se aplica por operação (connect, read de um chunk, etc.),
+    não à duração total da resposta. Um servidor que envia bytes em um fio
+    fino, mas contínuo, nunca estoura esse timeout e pode travar a ingestão
+    indefinidamente. Achado real do M1: um dos editais do PNCP fez isso.
+    """
+
+
 def _is_retryable_status(exc: BaseException) -> bool:
     if isinstance(exc, httpx.HTTPStatusError):
         return exc.response.status_code >= 500
@@ -48,9 +60,13 @@ class PNCPClient:
         self,
         listagem_timeout: float = 40.0,
         arquivo_timeout: float = 30.0,
+        arquivo_download_deadline: float = 60.0,
     ) -> None:
         self._listagem_client = httpx.Client(timeout=listagem_timeout)
         self._arquivo_client = httpx.Client(timeout=arquivo_timeout, follow_redirects=True)
+        # Prazo de parede para o corpo inteiro do download, independente de
+        # timeouts por chunk. Ver DownloadDeadlineExceeded.
+        self._arquivo_download_deadline = arquivo_download_deadline
 
     def close(self) -> None:
         self._listagem_client.close()
@@ -136,17 +152,31 @@ class PNCPClient:
         return resp.json()
 
     @retry(
-        retry=retry_if_exception_type(_RETRYABLE),
-        stop=stop_after_attempt(4),
+        retry=retry_if_exception_type(_RETRYABLE + (DownloadDeadlineExceeded,)),
+        stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=1, max=20),
         reraise=True,
     )
     def download_arquivo(self, cnpj: str, ano: int, sequencial: int, sequencial_documento: int) -> bytes:
-        """Baixa o pacote (ZIP) de um documento específico."""
+        """Baixa o pacote (ZIP ou PDF puro, ver pdf_text.extract_documents) de
+        um documento específico, com prazo total de parede.
+
+        Streaming em vez de .content: sem isso, um servidor que dribla bytes
+        lentamente nunca estoura o timeout por chunk do httpx e trava a
+        ingestão indefinidamente (achado real do M1).
+        """
         url = (
             f"{ARQUIVOS_BASE_URL}/orgaos/{cnpj}/compras/{ano}/{sequencial}"
             f"/arquivos/{sequencial_documento}"
         )
-        resp = self._arquivo_client.get(url)
-        resp.raise_for_status()
-        return resp.content
+        deadline = time.monotonic() + self._arquivo_download_deadline
+        chunks: list[bytes] = []
+        with self._arquivo_client.stream("GET", url) as resp:
+            resp.raise_for_status()
+            for chunk in resp.iter_bytes():
+                chunks.append(chunk)
+                if time.monotonic() > deadline:
+                    raise DownloadDeadlineExceeded(
+                        f"download de {url} passou de {self._arquivo_download_deadline}s"
+                    )
+        return b"".join(chunks)
