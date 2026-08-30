@@ -110,14 +110,12 @@ Formato de cada entrada: **Problema** → **Como apareceu** → **Impacto** →
   aceitar citação que não confere) — mas o resultado prático é uma
   **abstenção covarde**: a informação existia no documento e o sistema
   devolveu vazio.
-- **Solução:** ainda **não corrigido**. É uma limitação registrada, não
-  escondida. Caminhos a testar depois: reforçar "cópia literal" no prompt
-  com mais ênfase/exemplos, ou trocar o `citation_exists` de substring
-  exata para uma correspondência aproximada (fuzzy) com um limiar mínimo —
-  mas isso precisa de mais exemplos no conjunto dourado antes de decidir,
-  para não trocar uma abstenção covarde por uma citação alucinada aceita
-  por engano.
-- **Status:** ⚠️ risco conhecido, documentado, não corrigido.
+- **Solução:** reforçar "cópia literal" não foi tentado isoladamente — mas
+  ao corrigir o achado #11 (troca de modelo para `gemini-3.6-flash`), o
+  mesmo edital do DER-DF passou de 0 para 3 itens aceitos (ver achado #13).
+  Não dá para separar quanto veio do prompt e quanto veio do modelo mais
+  capaz; ambos mudaram juntos.
+- **Status:** ✅ melhora observada (não isolada). Ver achado #13.
 
 ### 7. A cota do Gemini é DIÁRIA (20 req/dia), não por minuto
 
@@ -208,17 +206,88 @@ Formato de cada entrada: **Problema** → **Como apareceu** → **Impacto** →
   manualmente os dois editais procurando "atestado", "capacidade técnica",
   "qualificação" — confirmei que não há exigência técnica real neles. O
   rótulo dourado estava certo; o problema é do modelo.
-- **Solução:** ainda **não corrigido**. Caminho a testar: listar
-  explicitamente, no prompt, exemplos do que NÃO conta (a lista de
-  declarações genéricas encontradas aqui é um ótimo ponto de partida).
-- **Status:** ⚠️ risco conhecido, medido, não corrigido.
+- **Solução:** duas camadas. (1) Prompt reforçado com a lista exata de
+  declarações genéricas encontradas aqui, como exemplos negativos. (2)
+  Filtro por palavra-chave NO CÓDIGO (`_e_habilitacao_generica` em
+  `extract_edital.py`) que rejeita qualquer item cujo texto contenha uma
+  das frases da lista — defesa em profundidade que não depende do modelo
+  obedecer o prompt. Mesmo espírito da proposta (seção 8): não usar LLM
+  para o que regex resolve.
+- **Status:** ✅ resolvido (prompt) + mitigado estruturalmente (filtro).
+  Ver achado #13 para validação parcial contra o conjunto dourado.
+
+### 12. Todo modelo do Gemini tem cota diária PRÓPRIA de 20/dia — inclusive os que você acabou de trocar para
+
+- **Como apareceu:** ao tentar reprocessar o conjunto dourado com os
+  prompts corrigidos, `gemini-2.5-flash` e `gemini-2.5-flash-lite` já
+  estavam com a cota do dia estourada (achados #7 e a tentativa seguinte).
+  Troquei para `gemini-2.0-flash` (descontinuado, a API aponta para
+  `gemini-3.6-flash`), testei `gemini-3.6-flash` isoladamente — funcionou.
+  Ao rodar o lote completo, um 503 (alta demanda) consumiu várias
+  tentativas de retry (cada tentativa é uma requisição real, conta na
+  cota) e o lote inteiro bateu em 429 de novo — desta vez com `model:
+  gemini-3.6-flash` na mensagem de erro.
+- **Impacto:** cada nome de modelo tem seu próprio balde de 20
+  requisições/dia (não é uma cota única por conta/projeto) — mas trocar
+  de modelo só compra fôlego uma vez por modelo, e retries durante uma
+  instabilidade momentânea (503) consomem esse fôlego rapidamente, mesmo
+  sem gerar nenhum resultado útil. "Trocar de modelo quando a cota
+  acaba" é uma estratégia de retorno decrescente: cada nome novo dá 20
+  chamadas, não 20 chamadas por dia para sempre.
+- **Solução:** nenhuma automática. Documentado como limite estrutural do
+  tier gratuito. Para reprocessar um conjunto dourado maior de forma
+  confiável, a alternativa real é habilitar faturamento (billing) na
+  conta do Gemini — o tier pago não tem esse teto diário — ou aceitar que
+  cada rodada de validação acontece aos poucos, ao longo de vários dias.
+- **Status:** ⚠️ limite estrutural da conta gratuita, sem solução dentro
+  do próprio tier gratuito. Afeta diretamente a viabilidade do M5 (portão
+  de CI): um gate de CI que roda a cada PR precisa de uma cota que não
+  estoure em 3 requisições de teste.
+
+### 13. Validação parcial dos achados #10 e #11: sinal positivo, mas incompleto
+
+- **Como apareceu:** dos 7 editais do conjunto dourado, só 2 conseguiram
+  ser reprocessados com os prompts corrigidos e `gemini-3.6-flash` antes
+  da cota travar de novo (achado #12) — exatamente os 2 editais com os
+  problemas mais graves conhecidos (DER-DF: habilitação toda rejeitada;
+  Comando da Aeronáutica: já abstinha corretamente antes).
+- **Resultado no DER-DF:** o prazo, que antes vinha como
+  `2026-09-08T00:00:00` (a data de abertura da sessão, com confiança
+  total e sem aviso), agora vem `null` com a explicação: *"O documento
+  estabelece que as propostas devem ser encaminhadas até a abertura da
+  sessão pública (item 3.3), mas apresenta explicitamente apenas a data
+  de início da sessão de disputa de preços, sem discriminar uma data e
+  horário específicos rotulados como prazo final de entrega de
+  propostas."* — o modelo agora reconhece a ambiguidade do próprio
+  documento em vez de escolher uma data com confiança falsa. Habilitação
+  foi de 0 itens aceitos (6-7 rejeitados, cópia não-literal) para 3 itens
+  aceitos e coerentes (aptidão técnico-operacional, experiência mínima de
+  3 anos, escritório local) com só 1 rejeitado.
+- **Resultado no Comando da Aeronáutica:** prazo e valor continuam `null`
+  (correto, igual antes); habilitação foi de 1 item questionável para 0 —
+  discutível se é regressão ou correção, porque o rótulo dourado deste
+  edital ("exigência de amostras") já era um caso de fronteira que eu
+  mesmo marquei como debatível ao montar o conjunto dourado.
+- **Leitura honesta:** isto NÃO é uma confirmação estatística — são só 2
+  editais, e uma resposta como null (abstenção) é estritamente melhor que
+  uma data errada com confiança, mesmo quando a métrica de acurácia
+  binária contra o rótulo dourado não sobe. Os outros 5 editais ainda têm
+  o resultado antigo (`gemini-2.5-flash-lite`, prompts antigos) em cache,
+  não reprocessados. A validação completa dos achados #10 e #11 fica
+  pendente até haver cota disponível de novo.
+- **Status:** 🟡 sinal positivo e qualitativamente convincente, validação
+  quantitativa completa bloqueada pelo achado #12.
 
 ---
 
 ## Como ler esta lista
 
-Dos 11 problemas registrados: **7 resolvidos**, **4 em aberto e
-documentados**. Nenhum foi escondido atrás de um número de acurácia
-"limpo" — é a mesma regra que o sistema aplica aos próprios dados
-(seção 8 da proposta: "não publique número de geração se a bateria não
+Dos 13 problemas registrados: **9 resolvidos ou com melhora observada**,
+**3 em aberto** (heurística de escolha de PDF, cota diária por modelo sem
+solução dentro do tier gratuito, e a mesma cota impedindo validação
+quantitativa completa), **1 em validação parcial** (achado #13 — sinal
+positivo, amostra pequena demais para confirmar). Nenhum foi escondido
+atrás de um número de acurácia "limpo" — é a mesma regra que o sistema
+aplica aos próprios dados (seção 8 da proposta: "não publique número de
+geração se a bateria não
 fechou") aplicada ao processo de construção do sistema.

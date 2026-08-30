@@ -17,12 +17,14 @@ Problemas reais encontrados construindo isto, e como cada um foi resolvido
   ressalva de escala (ver "Achado real" abaixo). Verificador (14 testes) e
   orquestração (9 testes) cobertos por testes offline; validado ao vivo em
   2 editais reais.
-- **M3 — conjunto dourado e harness: em andamento.** 7 editais rotulados à
-  mão (não por LLM), harness com camada `--sem-llm` e camada com conjunto
-  dourado. Meta da proposta é 40–60 editais. **Achado importante:** a
-  primeira rodada com N>2 já expôs um problema sério de acurácia no campo
-  mais crítico (prazo) — ver "M3 — resultado real" abaixo. Isso é o
-  harness fazendo exatamente o que devia fazer.
+- **M3 — conjunto dourado e harness: em andamento, correção em validação
+  parcial.** 7 editais rotulados à mão (não por LLM). A primeira rodada
+  com N>2 expôs 2 problemas sérios de acurácia (prazo confuso com abertura
+  de sessão; habilitação super-incluindo boilerplate jurídico) — corrigidos
+  no prompt e no código, mas a cota diária do Gemini (20/dia **por
+  modelo**, achado novo) só deixou reprocessar 2 dos 7 editais para medir
+  se a correção funcionou. Sinal qualitativo positivo nos 2, validação
+  quantitativa completa pendente. Detalhes: [`DIARIO-DE-BORDO.md`](DIARIO-DE-BORDO.md).
 
 ## Fonte de dados
 
@@ -246,3 +248,38 @@ modelo que super-incluiu. Adicionei uma 4ª categoria no harness
 (`extraido_indevidamente`) para não deixar esses casos desaparecerem da
 contagem — o bug original só tinha 3 categorias e esses 2 casos sumiam da
 soma sem gerar erro nem aviso.
+
+## M3 — correção tentada, validação parcial (bloqueada por cota, não por resultado)
+
+Depois dos dois achados acima: reforcei os dois prompts (prazo agora pede
+`datas_candidatas` com rótulo antes da resposta final; habilitação lista os
+exemplos exatos de boilerplate encontrados) e adicionei um filtro por
+palavra-chave no código para habilitação genérica, como defesa que não
+depende do modelo obedecer o prompt. Detalhes técnicos e os 3 achados de
+cota que apareceram tentando *medir* a correção estão no
+[`DIARIO-DE-BORDO.md`](DIARIO-DE-BORDO.md) (achados #12 e #13) — o resumo:
+
+- `gemini-2.5-flash` e `gemini-2.5-flash-lite` têm a MESMA cota de 20
+  requisições/dia, cada modelo com seu próprio balde. Troquei para
+  `gemini-3.6-flash` (o 2.0 foi descontinuado); um 503 transitório gastou
+  várias tentativas de retry e a cota estourou de novo antes de reprocessar
+  todo o conjunto dourado.
+- **Só 2 dos 7 editais foram reprocessados** antes da cota travar —
+  exatamente os 2 com os problemas mais graves conhecidos.
+- **Resultado nesses 2 (qualitativo, positivo, amostra pequena):** no
+  DER-DF, o prazo que antes vinha `2026-09-08T00:00:00` (a data de
+  abertura da sessão, com confiança total) agora vem `null`, com o modelo
+  explicando que o documento só declara a abertura da sessão pública, sem
+  uma data separada rotulada como prazo de entrega. Habilitação foi de 0
+  itens aceitos (todos rejeitados por cópia não-literal) para 3 itens
+  aceitos e tecnicamente coerentes. No Comando da Aeronáutica, prazo e
+  valor continuam corretamente `null`; habilitação foi de 1 item
+  questionável para 0 (discutível se é correção ou regressão — o rótulo
+  dourado deste caso já era de fronteira).
+- **Leitura honesta:** transformar uma resposta errada com confiança em uma
+  abstenção correta com justificativa é uma melhoria real mesmo quando a
+  métrica binária de acurácia não sobe — é exatamente o comportamento que
+  a proposta pede ("abstenção covarde é ruim, mas alucinação com confiança
+  é pior"). Mas são só 2 editais. **A validação quantitativa completa dos
+  7 fica pendente** até haver cota disponível de novo (reset diário, ou
+  faturamento habilitado na conta do Gemini).

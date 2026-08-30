@@ -11,7 +11,7 @@
       "valor_fonte": "leitura manual do texto extraído, página 1: 'VALOR TOTAL ESTIMADO: R$ 181.487.347,81.' — bate com a API",
       "tem_exigencias_habilitacao_tecnica": true,
       "habilitacao_fonte": "leitura manual: página cita exigência extensa de atestados de capacidade técnica (comprovação de execução de contratos, quantitativo mínimo de equipes por lote, art. 67 §5º da Lei 14.133/2021)",
-      "notas": "Edital grande (mão de obra terceirizada, DF). Boa checagem de estresse: exigências de habilitação longas e técnicas."
+      "notas": "Edital grande (mão de obra terceirizada, DF). Boa checagem de estresse: exigências de habilitação longas e técnicas. ATUALIZAÇÃO pós-correção do prompt de prazo: o sistema agora abstém no prazo com a justificativa de que o documento só declara a abertura da sessão pública (item 3.3), sem uma data separada e rotulada como prazo de entrega da proposta. Isto pode significar que o rótulo dourado aqui (vindo de dataEncerramentoProposta da API) está tecnicamente correto mas não é claramente derivável do texto do edital sozinho — não confirmei manualmente se o PDF tem uma frase distinta para o prazo de entrega. Rótulo mantido como está até essa confirmação; ver DIARIO-DE-BORDO.md achado #13."
     },
     {
       "key": "00394429000100-1-000899_2026",
