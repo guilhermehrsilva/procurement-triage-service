@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 
+from src.config import CUSTO_MAX_USD_POR_EDITAL, TIMEOUT_EXTRACAO_SEGUNDOS
 from src.extract.gemini_client import GeminiFieldExtractor
 from src.extract.prompts import (
     EXIGENCIAS_HABILITACAO,
@@ -63,6 +64,26 @@ def _e_habilitacao_generica(descricao: str, trecho: str) -> bool:
 
 def _paginas_por_numero(pages: list[dict]) -> dict[int, str]:
     return {p["page"]: p["text"] for p in pages}
+
+
+def _orcamento_excedido(llm: GeminiFieldExtractor) -> str | None:
+    """Checa o orçamento explícito (seção 4/6 da proposta) depois de cada
+    chamada de LLM. Retorna o motivo se algum limite estourou, senão None.
+
+    Sem isto, um edital gigante (ou uma sequência de retries) poderia
+    gastar cota/dinheiro sem limite — o mesmo tipo de risco que o achado
+    #12 do diário de bordo (cota diária do Gemini) já mostrou na prática.
+    """
+    if not hasattr(llm, "usage_snapshot"):
+        return None
+    uso = llm.usage_snapshot()
+    custo = uso.get("custo_estimado_usd", 0.0)
+    latencia = uso.get("latencia_total_segundos", 0.0)
+    if custo > CUSTO_MAX_USD_POR_EDITAL:
+        return f"orçamento excedido: custo acumulado US$ {custo:.4f} > limite US$ {CUSTO_MAX_USD_POR_EDITAL:.4f}"
+    if latencia > TIMEOUT_EXTRACAO_SEGUNDOS:
+        return f"timeout excedido: latência acumulada {latencia:.1f}s > limite {TIMEOUT_EXTRACAO_SEGUNDOS:.1f}s"
+    return None
 
 
 def extract_campo_data(
@@ -149,11 +170,28 @@ def extract_edital(
     if hasattr(llm, "reset_usage"):
         llm.reset_usage()
 
-    prazo = extract_campo_data(llm, documento, paginas)
-    valor = extract_campo_valor(llm, documento, paginas)
-    habilitacao = extract_campo_habilitacao(llm, documento, paginas)
-    divergencia = compute_divergencia(valor_api, valor.valor)
+    campos_nao_tentados: list[str] = []
+    motivo_interrupcao: str | None = None
 
+    prazo = extract_campo_data(llm, documento, paginas)
+    motivo_interrupcao = _orcamento_excedido(llm)
+
+    if motivo_interrupcao:
+        valor = CampoValor(motivo_nulo=motivo_interrupcao)
+        habilitacao = CampoHabilitacao()
+        campos_nao_tentados = ["valor_estimado", "exigencias_habilitacao"]
+        logger.warning("Extração de %s interrompida: %s", key, motivo_interrupcao)
+    else:
+        valor = extract_campo_valor(llm, documento, paginas)
+        motivo_interrupcao = _orcamento_excedido(llm)
+        if motivo_interrupcao:
+            habilitacao = CampoHabilitacao()
+            campos_nao_tentados = ["exigencias_habilitacao"]
+            logger.warning("Extração de %s interrompida: %s", key, motivo_interrupcao)
+        else:
+            habilitacao = extract_campo_habilitacao(llm, documento, paginas)
+
+    divergencia = compute_divergencia(valor_api, valor.valor)
     uso_llm = UsoLLM(**llm.usage_snapshot()) if hasattr(llm, "usage_snapshot") else UsoLLM()
 
     return ExtracaoEdital(
@@ -164,4 +202,6 @@ def extract_edital(
         exigencias_habilitacao=habilitacao,
         divergencia_valor=divergencia,
         uso_llm=uso_llm,
+        motivo_interrupcao=motivo_interrupcao,
+        campos_nao_tentados=campos_nao_tentados,
     )

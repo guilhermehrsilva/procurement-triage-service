@@ -35,6 +35,38 @@ class FakeLLM:
         return resposta
 
 
+class FakeLLMComOrcamento(FakeLLM):
+    """Como FakeLLM, mas simula acúmulo de custo/latência a cada chamada —
+    para testar o orçamento explícito (custo máximo, timeout) sem rede."""
+
+    def __init__(self, respostas: list, custo_por_chamada: float = 0.0, latencia_por_chamada: float = 0.0):
+        super().__init__(respostas)
+        self._custo_por_chamada = custo_por_chamada
+        self._latencia_por_chamada = latencia_por_chamada
+        self._custo_acumulado = 0.0
+        self._latencia_acumulada = 0.0
+
+    def reset_usage(self) -> None:
+        self._custo_acumulado = 0.0
+        self._latencia_acumulada = 0.0
+
+    def usage_snapshot(self) -> dict:
+        return {
+            "modelo": "fake",
+            "n_chamadas": self.chamadas,
+            "tokens_entrada": 0,
+            "tokens_saida": 0,
+            "custo_estimado_usd": self._custo_acumulado,
+            "latencia_total_segundos": self._latencia_acumulada,
+        }
+
+    def extract(self, prompt: str, response_schema):
+        resultado = super().extract(prompt, response_schema)
+        self._custo_acumulado += self._custo_por_chamada
+        self._latencia_acumulada += self._latencia_por_chamada
+        return resultado
+
+
 PAGINAS = {
     2: "As propostas deverão ser enviadas até o dia 14/09/2026 às 09:30, impreterivelmente.",
     3: "O valor total estimado para esta contratação é de R$ 123.456,78.",
@@ -218,3 +250,68 @@ def test_extract_edital_orquestra_os_tres_campos():
     assert resultado.divergencia_valor.valor_api == 0.0
     assert resultado.divergencia_valor.valor_pdf == 123456.78
     assert llm.chamadas == 3
+
+
+def test_extract_edital_para_quando_custo_excede_orcamento(monkeypatch):
+    import src.extract.extract_edital as mod
+
+    monkeypatch.setattr(mod, "CUSTO_MAX_USD_POR_EDITAL", 0.01)
+
+    llm = FakeLLMComOrcamento(
+        [
+            PrazoBruto(encontrado=True, valor_texto="14/09/2026 09:30", pagina=2, trecho=PAGINAS[2]),
+            CampoBruto(encontrado=True, valor_texto="R$ 123.456,78", pagina=3, trecho=PAGINAS[3]),
+            HabilitacaoBruta(itens=[]),
+        ],
+        custo_por_chamada=0.02,  # já estoura o limite na 1ª chamada
+    )
+    pages = [{"page": n, "text": t} for n, t in PAGINAS.items()]
+    resultado = extract_edital(llm, key="abc", numero_controle_pncp="1-2/2026", pages=pages, valor_api=None)
+
+    # só a 1ª chamada (prazo) foi feita; valor e habilitação nem foram tentados
+    assert llm.chamadas == 1
+    assert resultado.prazo_entrega_proposta.valor is not None
+    assert resultado.valor_estimado.valor is None
+    assert "orçamento excedido" in resultado.valor_estimado.motivo_nulo
+    assert resultado.motivo_interrupcao is not None
+    assert "orçamento excedido" in resultado.motivo_interrupcao
+    assert resultado.campos_nao_tentados == ["valor_estimado", "exigencias_habilitacao"]
+
+
+def test_extract_edital_para_quando_tempo_excede_timeout(monkeypatch):
+    import src.extract.extract_edital as mod
+
+    monkeypatch.setattr(mod, "TIMEOUT_EXTRACAO_SEGUNDOS", 5.0)
+
+    llm = FakeLLMComOrcamento(
+        [
+            PrazoBruto(encontrado=True, valor_texto="14/09/2026 09:30", pagina=2, trecho=PAGINAS[2]),
+            CampoBruto(encontrado=True, valor_texto="R$ 123.456,78", pagina=3, trecho=PAGINAS[3]),
+            HabilitacaoBruta(itens=[]),
+        ],
+        latencia_por_chamada=10.0,  # já estoura o limite na 1ª chamada
+    )
+    pages = [{"page": n, "text": t} for n, t in PAGINAS.items()]
+    resultado = extract_edital(llm, key="abc", numero_controle_pncp="1-2/2026", pages=pages, valor_api=None)
+
+    assert llm.chamadas == 1
+    assert "timeout excedido" in resultado.motivo_interrupcao
+
+
+def test_extract_edital_completa_normalmente_dentro_do_orcamento():
+    llm = FakeLLMComOrcamento(
+        [
+            PrazoBruto(encontrado=True, valor_texto="14/09/2026 09:30", pagina=2, trecho=PAGINAS[2]),
+            CampoBruto(encontrado=True, valor_texto="R$ 123.456,78", pagina=3, trecho=PAGINAS[3]),
+            HabilitacaoBruta(itens=[]),
+        ],
+        custo_por_chamada=0.001,
+        latencia_por_chamada=1.0,
+    )
+    pages = [{"page": n, "text": t} for n, t in PAGINAS.items()]
+    resultado = extract_edital(llm, key="abc", numero_controle_pncp="1-2/2026", pages=pages, valor_api=None)
+
+    assert llm.chamadas == 3
+    assert resultado.motivo_interrupcao is None
+    assert resultado.campos_nao_tentados == []
+    assert resultado.valor_estimado.valor == 123456.78

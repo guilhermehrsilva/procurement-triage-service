@@ -154,3 +154,9 @@ class ExtracaoEdital(BaseModel):
     exigencias_habilitacao: CampoHabilitacao
     divergencia_valor: Optional[DivergenciaValor] = None
     uso_llm: UsoLLM = Field(default_factory=UsoLLM)
+    motivo_interrupcao: Optional[str] = Field(
+        default=None,
+        description="Preenchido quando o orçamento (custo ou tempo) foi excedido no meio da "
+        "extração — os campos em campos_nao_tentados nem chegaram a ser tentados.",
+    )
+    campos_nao_tentados: list[str] = Field(default_factory=list)
