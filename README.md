@@ -7,6 +7,9 @@ habilitação, valor estimado — com citação verificável, recusa-se a respon
 quando não tem base, e ordena a fila de leitura pelo valor esperado sob a
 capacidade real de um time.
 
+Problemas reais encontrados construindo isto, e como cada um foi resolvido
+(ou por que ficou em aberto): [`DIARIO-DE-BORDO.md`](DIARIO-DE-BORDO.md).
+
 ## Status
 
 - **M1 — ingestão e corpus: concluído.** 300/300 editais processados.
