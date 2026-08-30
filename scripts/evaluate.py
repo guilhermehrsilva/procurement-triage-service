@@ -99,7 +99,7 @@ def _parse_prazo_golden(valor: str | None) -> dt.datetime | None:
     return dt.datetime.fromisoformat(valor) if valor else None
 
 
-def eval_com_golden_set(cache: DiskCache, golden_path: Path, allow_llm_calls: bool) -> dict:
+def eval_com_golden_set(cache: DiskCache, golden_path: Path, allow_llm_calls: bool, force: bool = False) -> dict:
     golden = json.loads(golden_path.read_text(encoding="utf-8"))
     editais = golden["editais"]
 
@@ -128,7 +128,7 @@ def eval_com_golden_set(cache: DiskCache, golden_path: Path, allow_llm_calls: bo
 
     for entry in editais:
         key = entry["key"]
-        if not cache.has_extraction(key):
+        if force or not cache.has_extraction(key):
             if not allow_llm_calls:
                 logger.warning("Sem extração em cache para %s e --allow-llm-calls não foi passado; pulando.", key)
                 pulados += 1
@@ -237,16 +237,23 @@ def main() -> None:
         "--allow-llm-calls", action="store_true",
         help="extrai os editais do golden set que ainda não têm resultado em cache (gasta cota do Gemini)",
     )
+    parser.add_argument(
+        "--force", action="store_true",
+        help="reextrai TODOS os editais do golden set, mesmo os já em cache (implica --allow-llm-calls; "
+        "use depois de mudar prompt/schema para medir se a mudança ajudou de verdade)",
+    )
     parser.add_argument("--cache-dir", default="data/cache")
     parser.add_argument("--golden-set", default="data/golden_set.json")
     parser.add_argument("--report", default="data/cache/eval_report.json")
     args = parser.parse_args()
+    if args.force:
+        args.allow_llm_calls = True
 
     cache = DiskCache(Path(args.cache_dir))
     report: dict = {"sem_llm": eval_sem_llm(cache, Path(args.cache_dir) / "report.json")}
 
     if not args.sem_llm:
-        report["com_llm"] = eval_com_golden_set(cache, Path(args.golden_set), args.allow_llm_calls)
+        report["com_llm"] = eval_com_golden_set(cache, Path(args.golden_set), args.allow_llm_calls, args.force)
 
     Path(args.report).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     logger.info("Relatório salvo em %s", args.report)
