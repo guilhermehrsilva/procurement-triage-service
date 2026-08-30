@@ -1,0 +1,29 @@
+{
+  "_leia_isto": "Rótulos feitos à mão, sem LLM (regra da proposta, seção 8). Fonte de cada campo declarada em 'fonte'. Começado com 2 editais (risco da proposta, seção 7: rotule poucos primeiro, rode o harness, aprenda antes de escalar).",
+  "editais": [
+    {
+      "key": "00070532000103-1-000047_2026",
+      "numero_controle_pncp": "00070532000103-1-000047/2026",
+      "orgao": "DEPARTAMENTO DE ESTRADAS DE RODAGEM DO DISTRITO FEDERAL",
+      "prazo_entrega_proposta": "2026-09-08T10:00:00",
+      "prazo_fonte": "dataEncerramentoProposta da API do PNCP (metadata cacheada), não lido do PDF",
+      "valor_estimado": 181487347.81,
+      "valor_fonte": "leitura manual do texto extraído, página 1: 'VALOR TOTAL ESTIMADO: R$ 181.487.347,81.' — bate com a API",
+      "tem_exigencias_habilitacao_tecnica": true,
+      "habilitacao_fonte": "leitura manual: página cita exigência extensa de atestados de capacidade técnica (comprovação de execução de contratos, quantitativo mínimo de equipes por lote, art. 67 §5º da Lei 14.133/2021)",
+      "notas": "Edital grande (mão de obra terceirizada, DF). Boa checagem de estresse: exigências de habilitação longas e técnicas."
+    },
+    {
+      "key": "00394429000100-1-000899_2026",
+      "numero_controle_pncp": "00394429000100-1-000899/2026",
+      "orgao": "COMANDO DA AERONÁUTICA",
+      "prazo_entrega_proposta": null,
+      "prazo_fonte": "dataEncerramentoProposta da API diz 2026-08-31T09:00:00, mas o objetivo aqui é o prazo ESCRITO NO EDITAL — não confirmei manualmente que o PDF traz essa mesma data explícita; marcado null até confirmar (não adivinhar é a mesma regra que vale para o sistema)",
+      "valor_estimado": null,
+      "valor_fonte": "API traz 0.0 (sigiloso). Sistema abstém corretamente aqui.",
+      "tem_exigencias_habilitacao_tecnica": true,
+      "habilitacao_fonte": "leitura manual: edital de calçados (fardamento), exige entrega de amostras para avaliação de conformidade — não é 'atestado de capacidade técnica' clássico, mas é uma exigência de habilitação técnica relevante para a decisão comercial",
+      "notas": "Objeto simples (aquisição de calçados) comparado ao edital 1. Bom contraste de porte."
+    }
+  ]
+}
