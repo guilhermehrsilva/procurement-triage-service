@@ -7,6 +7,8 @@ habilitação, valor estimado — com citação verificável, recusa-se a respon
 quando não tem base, e ordena a fila de leitura pelo valor esperado sob a
 capacidade real de um time.
 
+Repositório: https://github.com/guilhermehrsilva/procurement-triage-service (privado).
+
 Problemas reais encontrados construindo isto, e como cada um foi resolvido
 (ou por que ficou em aberto): [`DIARIO-DE-BORDO.md`](DIARIO-DE-BORDO.md).
 
@@ -30,6 +32,17 @@ Problemas reais encontrados construindo isto, e como cada um foi resolvido
   testado de verdade (build + up + healthcheck + curl nos 4 endpoints
   contra o cache real + down). Orçamento explícito (custo máximo e timeout
   por edital) aplicado no código, não só documentado.
+- **M5 — portão de qualidade em CI: concluído.** GitHub Actions roda em
+  todo PR (61 testes + `scripts/ci_gate.py` contra um fixture sintético).
+  Workflow manual separado (`workflow_dispatch`) para avaliação com Gemini
+  de verdade — nunca automática, por causa da cota diária (achado #12).
+  **Ciclo vermelho→verde demonstrado de verdade**, não simulado: o
+  primeiro push para o GitHub já pegou um bug real (pytest faltando no
+  `requirements.txt`, corrigido via
+  [PR #1](https://github.com/guilhermehrsilva/procurement-triage-service/pull/1));
+  depois, uma regressão deliberada do achado #5 (parser de hora) foi
+  reintroduzida, pegou CI vermelho, e corrigida no commit seguinte em
+  [PR #2](https://github.com/guilhermehrsilva/procurement-triage-service/pull/2).
 
 ## Fonte de dados
 
@@ -85,11 +98,22 @@ src/api/
                     no ciclo de requisição
   worker.py         worker assíncrono de ingestão (thread + job_id)
 src/config.py       CACHE_DIR, orçamento explícito (custo máximo, timeout)
+scripts/
+  ci_gate.py        portão de qualidade (M5): custo, rejeição, cobertura
+                    contra data/baseline_metrics.json, sem LLM
+.github/workflows/
+  ci.yml            roda em todo PR: 61 testes + ci_gate contra fixture
+  eval-llm-manual.yml   avaliação com Gemini de verdade, só manual
 data/
-  golden_set.json   conjunto dourado, rotulado à mão
-  cache/            metadata/, raw/, text/ (M1), extractions/ (M2) — local, fora do git
+  golden_set.json         conjunto dourado, rotulado à mão
+  baseline_metrics.json   teto/piso do portão de qualidade (M5)
+  cache/                  metadata/, raw/, text/ (M1), extractions/ (M2) — local, fora do git
 Dockerfile, docker-compose.yml   `docker compose up` sobe o serviço (M4)
-tests/              55 testes unitários, todos sem rede
+tests/
+  fixtures/cache/             fixture sintético pequeno para o CI (M5)
+  fixtures/golden_set_cache/  metadata+texto (M1) dos 7 editais do golden
+                              set, para o workflow manual de avaliação
+  61 testes unitários, todos sem rede
 ```
 
 ## Uso

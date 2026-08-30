@@ -289,9 +289,50 @@ conjunto dourado fica como pendência registrada, não escondida — retomar
 quando houver cota (reset diário ou billing) ou ao crescer o conjunto
 dourado mais adiante.
 
+## M5 — Portão de qualidade em CI
+
+### 14. O primeiro run de CI real falhou — pytest nunca tinha ido para o requirements.txt
+
+- **Como apareceu:** publiquei o repositório no GitHub (privado,
+  `guilhermehrsilva/procurement-triage-service`) e o primeiro push para
+  `main` disparou o workflow do GitHub Actions pela primeira vez. Falhou
+  em 18 segundos: `No module named pytest`.
+- **Impacto:** os 61 testes rodavam perfeitamente no ambiente local o
+  tempo todo — porque eu tinha instalado `pytest` manualmente no venv, na
+  primeira sessão, e nunca adicionei ao `requirements.txt`. Um ambiente
+  limpo (exatamente o que o CI é) não tinha o pacote. Isso só apareceu
+  porque rodei CI de verdade, contra uma máquina que eu não tinha
+  preparado à mão — o tipo exato de coisa que CI existe para pegar.
+- **Solução:** adicionado `pytest>=8.0` ao `requirements.txt`, via PR real
+  ([#1](https://github.com/guilhermehrsilva/procurement-triage-service/pull/1)),
+  não push direto — a evidência do CI vermelho (run
+  [33323380111](https://github.com/guilhermehrsilva/procurement-triage-service/actions/runs/33323380111))
+  está linkada na descrição do PR.
+- **Status:** ✅ resolvido, com PR de correção real no histórico.
+
+### 15. Demonstração deliberada do ciclo vermelho → verde (critério de "pronto" do M5)
+
+- **Como apareceu:** não é um bug — é a demonstração que a proposta pede
+  explicitamente (seção 6): "existe um PR no histórico com o CI vermelho
+  por regressão de qualidade, e o commit seguinte corrigindo."
+- **O que fiz:** em vez de inventar uma regressão artificial qualquer,
+  reintroduzi de propósito o bug real do achado #5 (parser de hora antes
+  da data) — revertendo `_com_hora_proxima` para a versão antiga — num PR
+  dedicado ([#2](https://github.com/guilhermehrsilva/procurement-triage-service/pull/2)).
+  O teste `test_parse_dates_hora_antes_da_data` (que existe desde a
+  correção original do achado #5) pegou a regressão e o CI ficou vermelho
+  de verdade. Um commit seguinte, na mesma branch/PR, reverteu a
+  regressão (`git revert`) — CI ficou verde, mergeado.
+- **Por que essa regressão e não outra:** usar um bug real já documentado
+  (em vez de um exemplo inventado tipo `assert 1 == 2`) mostra que o
+  portão de CI protege exatamente o tipo de regressão que este projeto já
+  sofreu na prática, não uma regressão de brinquedo.
+- **Status:** ✅ demonstrado. Evidência: PR #2, commits e histórico de
+  checks visíveis no GitHub.
+
 ## Como ler esta lista
 
-Dos 13 problemas registrados: **9 resolvidos ou com melhora observada**,
+Dos 15 problemas registrados: **11 resolvidos ou com melhora observada**,
 **3 em aberto** (heurística de escolha de PDF, cota diária por modelo sem
 solução dentro do tier gratuito, e a mesma cota impedindo validação
 quantitativa completa), **1 em validação parcial** (achado #13 — sinal
