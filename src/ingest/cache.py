@@ -26,13 +26,15 @@ class DiskCache:
     metadata_dir: Path = field(init=False)
     raw_dir: Path = field(init=False)
     text_dir: Path = field(init=False)
+    extractions_dir: Path = field(init=False)
 
     def __post_init__(self) -> None:
         self.root = Path(self.root)
         self.metadata_dir = self.root / "metadata"
         self.raw_dir = self.root / "raw"
         self.text_dir = self.root / "text"
-        for d in (self.metadata_dir, self.raw_dir, self.text_dir):
+        self.extractions_dir = self.root / "extractions"
+        for d in (self.metadata_dir, self.raw_dir, self.text_dir, self.extractions_dir):
             d.mkdir(parents=True, exist_ok=True)
 
     # -- metadados da listagem -------------------------------------------------
@@ -83,5 +85,27 @@ class DiskCache:
     def all_text_results(self) -> list[dict[str, Any]]:
         results = []
         for f in sorted(self.text_dir.glob("*.json")):
+            results.append(json.loads(f.read_text(encoding="utf-8")))
+        return results
+
+    # -- extração estruturada (M2) -------------------------------------------
+
+    def extraction_path(self, key: str) -> Path:
+        return self.extractions_dir / f"{key}.json"
+
+    def has_extraction(self, key: str) -> bool:
+        return self.extraction_path(key).exists()
+
+    def write_extraction_result(self, key: str, result: dict[str, Any]) -> None:
+        self.extraction_path(key).write_text(
+            json.dumps(result, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
+        )
+
+    def read_extraction_result(self, key: str) -> dict[str, Any]:
+        return json.loads(self.extraction_path(key).read_text(encoding="utf-8"))
+
+    def all_extraction_results(self) -> list[dict[str, Any]]:
+        results = []
+        for f in sorted(self.extractions_dir.glob("*.json")):
             results.append(json.loads(f.read_text(encoding="utf-8")))
         return results
