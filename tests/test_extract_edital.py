@@ -15,7 +15,7 @@ from src.extract.extract_edital import (
     extract_campo_valor,
     extract_edital,
 )
-from src.extract.schema import CampoBruto, HabilitacaoBruta, ItemHabilitacaoBruto
+from src.extract.schema import CampoBruto, HabilitacaoBruta, ItemHabilitacaoBruto, PrazoBruto
 
 
 class FakeLLM:
@@ -45,7 +45,7 @@ DOCUMENTO = "[PÁGINA 2]\n" + PAGINAS[2] + "\n\n[PÁGINA 3]\n" + PAGINAS[3] + "\
 
 def test_extract_campo_data_aceita_citacao_valida():
     llm = FakeLLM([
-        CampoBruto(
+        PrazoBruto(
             encontrado=True,
             valor_texto="14/09/2026 09:30",
             pagina=2,
@@ -60,7 +60,7 @@ def test_extract_campo_data_aceita_citacao_valida():
 
 def test_extract_campo_data_rejeita_citacao_inventada():
     llm = FakeLLM([
-        CampoBruto(
+        PrazoBruto(
             encontrado=True,
             valor_texto="20/10/2026",
             pagina=2,
@@ -73,10 +73,34 @@ def test_extract_campo_data_rejeita_citacao_inventada():
 
 
 def test_extract_campo_data_rejeita_quando_llm_nao_encontra():
-    llm = FakeLLM([CampoBruto(encontrado=False, motivo_nao_encontrado="edital não menciona prazo")])
+    llm = FakeLLM([PrazoBruto(encontrado=False, motivo_nao_encontrado="edital não menciona prazo")])
     campo = extract_campo_data(llm, DOCUMENTO, PAGINAS)
     assert campo.valor is None
     assert campo.motivo_nulo == "edital não menciona prazo"
+
+
+def test_extract_campo_data_usa_a_resposta_final_mesmo_com_candidatas_erradas():
+    # achado do M3: o modelo confundia "abertura da sessão" com o prazo real.
+    # datas_candidatas existe para o modelo listar as duas antes de decidir;
+    # o código só usa a resposta final (encontrado/valor_texto/trecho) — o
+    # teste confirma que ter uma candidata "errada" na lista não quebra nada.
+    from src.extract.schema import DataCandidata
+
+    llm = FakeLLM([
+        PrazoBruto(
+            datas_candidatas=[
+                DataCandidata(trecho="Data de Abertura: 06/03/2026 às 09:00h", pagina=1, rotulo="abertura da sessão pública"),
+                DataCandidata(trecho=PAGINAS[2], pagina=2, rotulo="prazo de entrega da proposta"),
+            ],
+            encontrado=True,
+            valor_texto="14/09/2026 09:30",
+            pagina=2,
+            trecho=PAGINAS[2],
+        )
+    ])
+    campo = extract_campo_data(llm, DOCUMENTO, PAGINAS)
+    assert campo.valor is not None
+    assert campo.citacao.pagina == 2
 
 
 def test_extract_campo_valor_aceita_citacao_valida():
@@ -130,6 +154,37 @@ def test_extract_campo_habilitacao_filtra_itens_com_citacao_invalida():
     assert campo.itens_rejeitados == 1
 
 
+def test_extract_campo_habilitacao_filtra_declaracao_juridica_generica():
+    # achado do M3: o LLM super-incluía declaração jurídica genérica (aqui,
+    # cota para pessoa com deficiência) como se fosse habilitação técnica.
+    # A citação existe de verdade no documento (não é o caso de invenção),
+    # mas o filtro por palavra-chave deve rejeitar mesmo assim.
+    paginas = dict(PAGINAS)
+    paginas[7] = "O licitante deve declarar que cumpre as exigências de reserva de cargos para pessoa com deficiência."
+    documento = DOCUMENTO + "\n\n[PÁGINA 7]\n" + paginas[7]
+
+    llm = FakeLLM([
+        HabilitacaoBruta(
+            itens=[
+                ItemHabilitacaoBruto(
+                    descricao="atestado de capacidade técnica",
+                    pagina=5,
+                    trecho=PAGINAS[5],
+                ),
+                ItemHabilitacaoBruto(
+                    descricao="declaração de cota para pessoa com deficiência",
+                    pagina=7,
+                    trecho=paginas[7],
+                ),
+            ]
+        )
+    ])
+    campo = extract_campo_habilitacao(llm, documento, paginas)
+    assert len(campo.itens) == 1
+    assert campo.itens[0].descricao == "atestado de capacidade técnica"
+    assert campo.itens_rejeitados == 1
+
+
 def test_compute_divergencia_ambos_presentes():
     div = compute_divergencia(valor_api=100_000.0, valor_pdf=123_456.78)
     assert div.diferenca_absoluta == 23456.78
@@ -142,7 +197,7 @@ def test_compute_divergencia_sem_nenhum_valor_retorna_none():
 
 def test_extract_edital_orquestra_os_tres_campos():
     llm = FakeLLM([
-        CampoBruto(
+        PrazoBruto(
             encontrado=True, valor_texto="14/09/2026 09:30", pagina=2,
             trecho=PAGINAS[2],
         ),

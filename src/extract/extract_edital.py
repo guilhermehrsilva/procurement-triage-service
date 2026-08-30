@@ -26,11 +26,39 @@ from src.extract.schema import (
     ExigenciaHabilitacao,
     ExtracaoEdital,
     HabilitacaoBruta,
+    PrazoBruto,
     UsoLLM,
 )
 from src.extract.verifier import citation_exists, verify_currency_field, verify_date_field
 
 logger = logging.getLogger(__name__)
+
+# Defesa em profundidade contra o achado do M3: o LLM super-inclui
+# declaração jurídica/trabalhista genérica como se fosse habilitação
+# técnica, mesmo com o prompt pedindo para excluir. Isto aqui não depende
+# do modelo obedecer — é regex sobre o próprio trecho citado (a citação já
+# passou por citation_exists, então é texto real do documento). Mesmo
+# espírito da seção 8 da proposta: não usar LLM para o que regex resolve.
+_FRASES_HABILITACAO_GENERICA = [
+    "pessoa com deficiência",
+    "reabilitado da previdência",
+    "menor de 18",
+    "menor de 16",
+    "trabalho degradante",
+    "trabalho forçado",
+    "empresas punidas",  # Cadastro Nacional de Empresas Punidas (CNEP)
+    "cnep",
+    "sociedade cooperativa",
+    "art. 16 da lei",  # regras de cooperativa, Lei 14.133/2021
+    "atende aos requisitos de habilitação",
+    "condições do edital",
+    "custos trabalhistas",
+]
+
+
+def _e_habilitacao_generica(descricao: str, trecho: str) -> bool:
+    texto = f"{descricao} {trecho}".lower()
+    return any(frase in texto for frase in _FRASES_HABILITACAO_GENERICA)
 
 
 def _paginas_por_numero(pages: list[dict]) -> dict[int, str]:
@@ -40,7 +68,7 @@ def _paginas_por_numero(pages: list[dict]) -> dict[int, str]:
 def extract_campo_data(
     llm: GeminiFieldExtractor, documento: str, paginas: dict[int, str]
 ) -> CampoData:
-    bruto: CampoBruto = llm.extract(PRAZO_ENTREGA_PROPOSTA.format(documento=documento), CampoBruto)
+    bruto: PrazoBruto = llm.extract(PRAZO_ENTREGA_PROPOSTA.format(documento=documento), PrazoBruto)
 
     if not bruto.encontrado:
         return CampoData(motivo_nulo=bruto.motivo_nao_encontrado or "LLM não encontrou o campo")
@@ -84,13 +112,17 @@ def extract_campo_habilitacao(
     rejeitados = 0
     for item in bruto.itens:
         texto_pagina = paginas.get(item.pagina)
-        if citation_exists(item.trecho, texto_pagina):
-            itens_validos.append(
-                ExigenciaHabilitacao(descricao=item.descricao, citacao=Citacao(pagina=item.pagina, trecho=item.trecho))
-            )
-        else:
+        if not citation_exists(item.trecho, texto_pagina):
             rejeitados += 1
             logger.warning("Exigência de habilitação rejeitada (citação não confere): %r", item.descricao)
+            continue
+        if _e_habilitacao_generica(item.descricao, item.trecho):
+            rejeitados += 1
+            logger.warning("Exigência de habilitação rejeitada (declaração jurídica genérica): %r", item.descricao)
+            continue
+        itens_validos.append(
+            ExigenciaHabilitacao(descricao=item.descricao, citacao=Citacao(pagina=item.pagina, trecho=item.trecho))
+        )
 
     return CampoHabilitacao(itens=itens_validos, itens_rejeitados=rejeitados)
 

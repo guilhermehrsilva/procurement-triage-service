@@ -42,6 +42,47 @@ class CampoBruto(BaseModel):
     motivo_nao_encontrado: Optional[str] = None
 
 
+class DataCandidata(BaseModel):
+    """Uma data candidata encontrada no documento, com o que ela representa.
+
+    Achado do M3: pedir a resposta final direto faz o modelo confundir a
+    data de abertura da sessão com o prazo de entrega da proposta. Forçar
+    a listagem de candidatas com rótulo, antes da escolha final, é a
+    mesma técnica de "listar antes de decidir" que ajuda em qualquer
+    tarefa de desambiguação.
+    """
+
+    trecho: str = Field(description="Cópia LITERAL do trecho que contém essa data.")
+    pagina: int
+    rotulo: str = Field(
+        description="O que essa data representa: 'prazo de entrega da proposta', 'abertura da sessão "
+        "pública/disputa', 'publicação do edital', 'impugnação/esclarecimentos', 'assinatura/retificação "
+        "do documento', ou 'outro'."
+    )
+
+
+class PrazoBruto(BaseModel):
+    """Resposta do LLM para o prazo de entrega da proposta.
+
+    `datas_candidatas` é preenchido ANTES de `encontrado`/`valor_texto` —
+    a ordem no schema não garante ordem de geração, mas o prompt pede
+    explicitamente para listar candidatas primeiro.
+    """
+
+    datas_candidatas: list[DataCandidata] = Field(default_factory=list)
+    encontrado: bool
+    valor_texto: Optional[str] = Field(
+        default=None, description="O prazo tal como aparece no documento (ex.: '14/09/2026 09:30')."
+    )
+    pagina: Optional[int] = None
+    trecho: Optional[str] = Field(
+        default=None,
+        description="Cópia LITERAL (verbatim) do trecho que contém o prazo escolhido. Deve ser um dos "
+        "trechos já listados em datas_candidatas, com rotulo='prazo de entrega da proposta'.",
+    )
+    motivo_nao_encontrado: Optional[str] = None
+
+
 class ItemHabilitacaoBruto(BaseModel):
     descricao: str = Field(description="Resumo curto da exigência de habilitação/capacidade técnica.")
     pagina: int
