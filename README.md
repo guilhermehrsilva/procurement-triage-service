@@ -14,10 +14,12 @@ capacidade real de um time.
   ressalva de escala (ver "Achado real" abaixo). Verificador (14 testes) e
   orquestração (9 testes) cobertos por testes offline; validado ao vivo em
   2 editais reais.
-- **M3 — conjunto dourado e harness: iniciado.** 2 editais rotulados à mão
-  (não por LLM), harness com camada `--sem-llm` e camada com conjunto
-  dourado, ambas testadas offline. Meta da proposta é 40–60 editais; ver
-  "Por que só 2" abaixo.
+- **M3 — conjunto dourado e harness: em andamento.** 7 editais rotulados à
+  mão (não por LLM), harness com camada `--sem-llm` e camada com conjunto
+  dourado. Meta da proposta é 40–60 editais. **Achado importante:** a
+  primeira rodada com N>2 já expôs um problema sério de acurácia no campo
+  mais crítico (prazo) — ver "M3 — resultado real" abaixo. Isso é o
+  harness fazendo exatamente o que devia fazer.
 
 ## Fonte de dados
 
@@ -179,10 +181,65 @@ exemplos no conjunto dourado antes de decidir.
   por campo, custo e latência por edital (de `uso_llm` em cada extração).
   Por padrão usa só o cache; `--allow-llm-calls` extrai o que faltar.
 
-Resultado atual (2/2 editais do conjunto dourado, ambos já em cache):
+## M3 — achado real: cota do Gemini é DIÁRIA, não por minuto
 
-| Campo | Resultado |
-|---|---|
-| `prazo_entrega_proposta` | 1/2 — o erro é o caso do DER-DF acima (parser corrigido depois da extração; não reprocessado para não gastar cota) |
-| `valor_estimado` | 2/2 |
-| `exigencias_habilitacao` | 1 extraído corretamente, 1 abstenção covarde (achado acima) |
+Ao tentar extrair os 5 editais novos do conjunto dourado, o `gemini-2.5-flash`
+devolveu `429 RESOURCE_EXHAUSTED` com a mensagem
+`GenerateRequestsPerDayPerProjectPerModel-FreeTier, quotaValue: 20`. Não é
+limite de requisições por minuto — é **20 requisições por dia**, no total,
+para esse modelo. Um único edital (3 chamadas) já consome 15% da cota
+diária inteira; o lote de 5 editais (15 chamadas) não cabia de jeito
+nenhum. Troquei o modelo padrão para `gemini-2.5-flash-lite`, que tem cota
+diária bem maior no tier gratuito, e a extração dos 5 editais completou
+normalmente depois disso. `uso_llm.modelo` agora registra qual modelo
+gerou cada extração, para rastreabilidade.
+
+## M3 — resultado real (7 editais no conjunto dourado)
+
+| Campo | Resultado | Leitura |
+|---|---|---|
+| `prazo_entrega_proposta` | **2/7 (28,6%)** | Ver achado abaixo — é sério. |
+| `valor_estimado` | 6/7 (85,7%) | O erro é um caso limítrofe de propósito (ver `golden_set.json`, edital do Comando do Exército): o texto tem um valor em R$ que parece boilerplate de outro edital; o sistema extraiu, o rótulo dourado diz null. Divergência de julgamento, não claramente um bug. |
+| `exigencias_habilitacao` | 4 extraídos corretamente, 1 abstenção covarde, **2 extraídos indevidamente** | Ver achado abaixo. |
+
+Custo: US$ 0,1405 total / US$ 0,0281 por edital em média (7 editais, `gemini-2.5-flash-lite`).
+Latência por edital: p50 = 12,1s, p95 = 35,9s (3 chamadas de LLM por edital).
+
+### Achado real: o modelo confunde "abertura da sessão" com "prazo da proposta"
+
+**Este é o achado mais importante do M3 até agora**, porque prazo é o campo
+que a proposta (seção 1) chama de mais caro errar: "Errar aqui é perder a
+licitação." Em pelo menos 3 dos 5 editais novos, o valor extraído bate com
+uma *outra* data do documento — data de abertura de sessão, ou outra data
+qualquer — não com o prazo real de entrega da proposta. Exemplo concreto:
+o edital da Secretaria de Administração da Paraíba diz explicitamente
+"Data de Abertura: 06/03/2026 às 09:00h" logo na primeira página, e é
+exatamente esse valor que o sistema devolveu — mesmo o prompt dizendo
+textualmente "não confunda com data de abertura da sessão". O prazo real
+(`dataEncerramentoProposta` na API) era 01/09/2026.
+
+Isso não é um bug de parsing (o verificador confirmou a citação e a data
+corretamente) — é o LLM respondendo à pergunta errada com confiança. Precisa
+de mais exemplos no conjunto dourado para confirmar o padrão, e provavelmente
+de um prompt mais explícito (ex.: pedir para o modelo primeiro listar todas
+as datas candidatas antes de escolher, ou dar exemplos negativos).
+
+### Achado real: o modelo super-inclui declaração jurídica genérica como "habilitação técnica"
+
+Em 2 dos 7 editais, o sistema devolveu de 6 a 8 itens de "habilitação
+técnica" que, na inspeção, são só declarações jurídicas padrão presentes em
+praticamente todo edital público — cumprimento de cotas para PCD, não
+emprego de menor, ausência de trabalho degradante, regras de cooperativa,
+consulta ao CNEP. O prompt pede explicitamente para excluir "habilitação
+jurídica ou fiscal genérica", mas o modelo incluiu mesmo assim. As citações
+em si são reais (passaram no verificador — o texto existe, verbatim, no
+documento), então isto não é alucinação de citação; é o modelo não
+respeitando o filtro de relevância do prompt.
+
+**Confirmei que os rótulos dourados desses 2 editais estavam certos**
+(nenhum atestado de capacidade técnica de verdade nesses editais, e sim
+essas declarações genéricas) — não é o meu rótulo manual que errou, é o
+modelo que super-incluiu. Adicionei uma 4ª categoria no harness
+(`extraido_indevidamente`) para não deixar esses casos desaparecerem da
+contagem — o bug original só tinha 3 categorias e esses 2 casos sumiam da
+soma sem gerar erro nem aviso.

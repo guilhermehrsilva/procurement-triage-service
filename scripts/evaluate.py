@@ -115,7 +115,12 @@ def eval_com_golden_set(cache: DiskCache, golden_path: Path, allow_llm_calls: bo
 
     acertos_prazo = erros_prazo = 0
     acertos_valor = erros_valor = 0
-    habilitacao_classificacao = {"extraido_corretamente": 0, "abstencao_correta": 0, "abstencao_covarde": 0}
+    habilitacao_classificacao = {
+        "extraido_corretamente": 0,
+        "abstencao_correta": 0,
+        "abstencao_covarde": 0,
+        "extraido_indevidamente": 0,  # golden diz que não há, sistema encontrou itens (falso positivo)
+    }
     custos_usd = []
     latencias_s = []
     detalhes = []
@@ -179,6 +184,8 @@ def eval_com_golden_set(cache: DiskCache, golden_path: Path, allow_llm_calls: bo
             habilitacao_classificacao["abstencao_correta"] += 1
         elif tem_hab_golden and not tem_hab_sistema:
             habilitacao_classificacao["abstencao_covarde"] += 1
+        else:  # not tem_hab_golden and tem_hab_sistema
+            habilitacao_classificacao["extraido_indevidamente"] += 1
         detalhe["habilitacao"] = (
             f"golden_tem={tem_hab_golden} sistema_tem={tem_hab_sistema} "
             f"({len(resultado['exigencias_habilitacao']['itens'])} aceito(s), "
