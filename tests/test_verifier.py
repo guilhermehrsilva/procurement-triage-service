@@ -33,6 +33,12 @@ def test_parse_dates_numeric_without_time_defaults_midnight():
     assert dt.datetime(2026, 12, 1, 0, 0) in datas
 
 
+def test_parse_dates_hora_antes_da_data():
+    # achado real (edital DER-DF): a hora vem ANTES da data por extenso.
+    datas = parse_dates("INÍCIO DA SESSÃO: às 10h do dia 08 de setembro de 2026.")
+    assert dt.datetime(2026, 9, 8, 10, 0) in datas
+
+
 def test_parse_dates_por_extenso():
     datas = parse_dates("São Paulo, 14 de setembro de 2026.")
     assert dt.datetime(2026, 9, 14, 0, 0) in datas

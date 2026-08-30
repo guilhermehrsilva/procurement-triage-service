@@ -26,6 +26,11 @@ T = TypeVar("T", bound=BaseModel)
 
 DEFAULT_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 
+# Preços aproximados do gemini-2.5-flash em 29/08/2026 (USD por 1M de tokens).
+# Configurável porque preço de LLM muda; isto é estimativa, não fatura.
+_PRECO_INPUT_POR_1M = float(os.environ.get("GEMINI_PRECO_INPUT_POR_1M_USD", "0.30"))
+_PRECO_OUTPUT_POR_1M = float(os.environ.get("GEMINI_PRECO_OUTPUT_POR_1M_USD", "2.50"))
+
 # Achado do M2: mesmo espaçando a 6,5s, a cota gratuita devolveu 429/503 com
 # frequência. O retry com backoff (abaixo) resolve, mas é lento. Espaçamos
 # mais para gastar menos tentativas.
@@ -65,6 +70,31 @@ class GeminiFieldExtractor:
         self._client = genai.Client(api_key=api_key or os.environ["GEMINI_API_KEY"])
         self._model = model
         self._rate_limiter = _RateLimiter(_MIN_SECONDS_BETWEEN_CALLS)
+        self._n_chamadas = 0
+        self._tokens_entrada = 0
+        self._tokens_saida = 0
+        self._latencia_total_s = 0.0
+
+    def reset_usage(self) -> None:
+        """Zera os contadores — chamar antes de processar um novo edital,
+        para medir custo e latência por documento (seção 5 da proposta)."""
+        self._n_chamadas = 0
+        self._tokens_entrada = 0
+        self._tokens_saida = 0
+        self._latencia_total_s = 0.0
+
+    def usage_snapshot(self) -> dict:
+        custo_usd = (
+            self._tokens_entrada / 1_000_000 * _PRECO_INPUT_POR_1M
+            + self._tokens_saida / 1_000_000 * _PRECO_OUTPUT_POR_1M
+        )
+        return {
+            "n_chamadas": self._n_chamadas,
+            "tokens_entrada": self._tokens_entrada,
+            "tokens_saida": self._tokens_saida,
+            "custo_estimado_usd": round(custo_usd, 6),
+            "latencia_total_segundos": round(self._latencia_total_s, 2),
+        }
 
     @retry(
         retry=retry_if_exception(_is_retryable),
@@ -74,6 +104,7 @@ class GeminiFieldExtractor:
     )
     def extract(self, prompt: str, response_schema: type[T]) -> T:
         self._rate_limiter.wait()
+        inicio = time.monotonic()
         resp = self._client.models.generate_content(
             model=self._model,
             contents=prompt,
@@ -82,6 +113,14 @@ class GeminiFieldExtractor:
                 response_schema=response_schema,
             ),
         )
+        self._latencia_total_s += time.monotonic() - inicio
+        self._n_chamadas += 1
+        usage = resp.usage_metadata
+        if usage is not None:
+            self._tokens_entrada += usage.prompt_token_count or 0
+            # tokens de "pensamento" (thinking) são cobrados como saída
+            self._tokens_saida += (usage.candidates_token_count or 0) + (usage.thoughts_token_count or 0)
+
         if resp.parsed is None:
             raise ValueError(f"Gemini não devolveu JSON parseável: {resp.text!r}")
         return resp.parsed

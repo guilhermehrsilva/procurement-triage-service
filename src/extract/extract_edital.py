@@ -26,6 +26,7 @@ from src.extract.schema import (
     ExigenciaHabilitacao,
     ExtracaoEdital,
     HabilitacaoBruta,
+    UsoLLM,
 )
 from src.extract.verifier import citation_exists, verify_currency_field, verify_date_field
 
@@ -113,10 +114,15 @@ def extract_edital(
     documento = build_document_context(pages)
     paginas = _paginas_por_numero(pages)
 
+    if hasattr(llm, "reset_usage"):
+        llm.reset_usage()
+
     prazo = extract_campo_data(llm, documento, paginas)
     valor = extract_campo_valor(llm, documento, paginas)
     habilitacao = extract_campo_habilitacao(llm, documento, paginas)
     divergencia = compute_divergencia(valor_api, valor.valor)
+
+    uso_llm = UsoLLM(**llm.usage_snapshot()) if hasattr(llm, "usage_snapshot") else UsoLLM()
 
     return ExtracaoEdital(
         key=key,
@@ -125,4 +131,5 @@ def extract_edital(
         valor_estimado=valor,
         exigencias_habilitacao=habilitacao,
         divergencia_valor=divergencia,
+        uso_llm=uso_llm,
     )

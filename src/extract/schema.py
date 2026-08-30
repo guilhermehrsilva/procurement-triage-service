@@ -93,6 +93,17 @@ class DivergenciaValor(BaseModel):
     diferenca_percentual: Optional[float]
 
 
+class UsoLLM(BaseModel):
+    """Custo e latência agregados das chamadas de LLM para este edital
+    (seção 5 da proposta: custo por edital, latência p50/p95)."""
+
+    n_chamadas: int = 0
+    tokens_entrada: int = 0
+    tokens_saida: int = 0
+    custo_estimado_usd: float = 0.0
+    latencia_total_segundos: float = 0.0
+
+
 class ExtracaoEdital(BaseModel):
     key: str
     numero_controle_pncp: str
@@ -100,3 +111,4 @@ class ExtracaoEdital(BaseModel):
     valor_estimado: CampoValor
     exigencias_habilitacao: CampoHabilitacao
     divergencia_valor: Optional[DivergenciaValor] = None
+    uso_llm: UsoLLM = Field(default_factory=UsoLLM)
