@@ -1,0 +1,22 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - CACHE_DIR=/app/data/cache
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.6-flash}
+      - CUSTO_MAX_USD_POR_EDITAL=${CUSTO_MAX_USD_POR_EDITAL:-0.05}
+      - TIMEOUT_EXTRACAO_SEGUNDOS=${TIMEOUT_EXTRACAO_SEGUNDOS:-60}
+    env_file:
+      - .env
+    volumes:
+      # cache local persiste entre reinícios do container — os dados já
+      # ingeridos (M1) e extraídos (M2) não somem quando o container cai
+      - ./data/cache:/app/data/cache
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
