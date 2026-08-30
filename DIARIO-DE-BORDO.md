@@ -280,6 +280,15 @@ Formato de cada entrada: **Problema** → **Como apareceu** → **Impacto** →
 
 ---
 
+### Decisão: seguir para o M4 com validação parcial
+
+Consultado, optei (a pedido do usuário) por seguir para o M4 em vez de
+esperar o reset da cota ou habilitar faturamento. A validação
+quantitativa completa dos achados #10/#11 contra os 7 editais do
+conjunto dourado fica como pendência registrada, não escondida — retomar
+quando houver cota (reset diário ou billing) ou ao crescer o conjunto
+dourado mais adiante.
+
 ## Como ler esta lista
 
 Dos 13 problemas registrados: **9 resolvidos ou com melhora observada**,
