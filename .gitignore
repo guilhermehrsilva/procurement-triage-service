@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 .env
 data/cache/
+data/*.log
 sample_response.json
 *.egg-info/
 .pytest_cache/

@@ -9,7 +9,7 @@ capacidade real de um time.
 
 ## Status
 
-**M1 — ingestão e corpus: em andamento.**
+**M1 — ingestão e corpus: concluído.** 300/300 editais processados.
 
 ## Fonte de dados
 
@@ -75,4 +75,19 @@ Rodar os testes (sem rede):
 
 ## Relatório de cobertura (M1)
 
-_Preenchido após o lote de 300 editais — ver `data/cache/report.json`._
+Lote de 300 editais de Pregão Eletrônico com proposta aberta até 30/09/2026
+(`data-final=20260930`), processado em 29,9 min (`data/cache/report.json`):
+
+| Status | Qtde | % |
+|---|---|---|
+| `texto_ok` | 290 | 96,7% |
+| `imagem_escaneada` | 4 | 1,3% |
+| `sem_pdf_no_pacote` | 5 | 1,7% |
+| `falha_extracao_texto` | 1 | 0,3% |
+
+**Leitura:** a esmagadora maioria dos editais rende texto extraível sem OCR.
+`sem_pdf_no_pacote` são casos em que o "documento" listado pelo PNCP como
+Edital não continha PDF (só planilha, ou pacote vazio) — vale investigar
+manualmente antes do M2, não é necessariamente um bug de extração.
+`imagem_escaneada` é o limite conhecido e aceito (seção 7 da proposta): OCR
+fica para outra fase.
