@@ -107,6 +107,27 @@ def test_metrics_vazio_nao_quebra(cache_dir, client):
     assert resp.json()["n_editais_extraidos"] == 0
 
 
+def test_post_ingestao_dispara_job_e_devolve_202(cache_dir, client, monkeypatch):
+    monkeypatch.setattr(api_main.worker, "start_ingestao_job", lambda cache_dir, n, data_final: "job-123")
+    resp = client.post("/ingestao?n=10&data_final=20260930")
+    assert resp.status_code == 202
+    assert resp.json() == {"job_id": "job-123", "status": "enfileirado"}
+
+
+def test_get_ingestao_status_desconhecido_404(cache_dir, client):
+    resp = client.get("/ingestao/job-que-nao-existe")
+    assert resp.status_code == 404
+
+
+def test_get_ingestao_status_existente(cache_dir, client, monkeypatch):
+    monkeypatch.setattr(
+        api_main.worker, "get_job", lambda job_id: {"status": "concluido", "processados": 10, "n_solicitado": 10}
+    )
+    resp = client.get("/ingestao/job-123")
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "concluido"
+
+
 def test_metrics_agrega_custo_latencia_e_abstencao(cache_dir, client):
     _popular_edital(cache_dir, "a", valor_pdf=1000.0, prazo="2026-09-08T10:00:00", custo=0.01, latencia=5.0)
     _popular_edital(cache_dir, "b", valor_pdf=None, prazo=None, custo=0.02, latencia=10.0)

@@ -16,6 +16,7 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query
 
+from src.api import worker
 from src.config import CACHE_DIR
 from src.ingest.cache import DiskCache
 
@@ -103,6 +104,25 @@ def get_fila(capacidade: int = Query(10, ge=1, le=1000)) -> dict[str, Any]:
         "fila": itens[:capacidade],
         "valor_capturado_na_fila": round(sum(i["valor_esperado"] for i in itens[:capacidade]), 2),
     }
+
+
+@app.post("/ingestao", status_code=202)
+def start_ingestao(
+    n: int = Query(50, ge=1, le=1000, description="quantos editais buscar"),
+    data_final: str = Query(..., description="AAAAMMDD, mesmo formato da API do PNCP"),
+) -> dict[str, Any]:
+    """Dispara ingestão em background (worker assíncrono, ver src/api/worker.py)
+    e devolve um job_id na hora — não bloqueia esperando a listagem do PNCP."""
+    job_id = worker.start_ingestao_job(CACHE_DIR, n, data_final)
+    return {"job_id": job_id, "status": "enfileirado"}
+
+
+@app.get("/ingestao/{job_id}")
+def get_ingestao_status(job_id: str) -> dict[str, Any]:
+    job = worker.get_job(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail=f"job '{job_id}' não encontrado")
+    return {"job_id": job_id, **job}
 
 
 def _percentil(valores: list[float], p: float) -> float | None:
