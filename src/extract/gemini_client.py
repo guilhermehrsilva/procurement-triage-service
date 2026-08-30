@@ -28,8 +28,12 @@ T = TypeVar("T", bound=BaseModel)
 # requisições/DIA (não é limite por minuto — é
 # "GenerateRequestsPerDayPerProjectPerModel-FreeTier", quotaValue=20). Um
 # único edital (3 chamadas) já consome 15% da cota diária. gemini-2.5-flash-lite
-# tem cota diária bem maior no tier gratuito.
-DEFAULT_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash-lite")
+# tem A MESMA cota de 20/dia (achado #2: trocar de variante do 2.5 não
+# ajuda). gemini-2.0-flash foi descontinuado (a API aponta para
+# gemini-3.6-flash). Cada nome de modelo parece ter cota diária própria, e
+# gemini-3.6-flash — não tocado antes no mesmo dia — dá fôlego extra sem
+# esperar o reset da cota do 2.5.
+DEFAULT_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.6-flash")
 
 # Preços aproximados do gemini-2.5-flash em 29/08/2026 (USD por 1M de tokens).
 # Configurável porque preço de LLM muda; isto é estimativa, não fatura.
