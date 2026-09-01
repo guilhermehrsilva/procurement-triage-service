@@ -7,7 +7,7 @@ habilitação, valor estimado — com citação verificável, recusa-se a respon
 quando não tem base, e ordena a fila de leitura pelo valor esperado sob a
 capacidade real de um time.
 
-Repositório: https://github.com/guilhermehrsilva/procurement-triage-service (privado).
+Repositório: https://github.com/guilhermehrsilva/procurement-triage-service
 
 Problemas reais encontrados construindo isto, e como cada um foi resolvido
 (ou por que ficou em aberto): [`DIARIO-DE-BORDO.md`](DIARIO-DE-BORDO.md).
